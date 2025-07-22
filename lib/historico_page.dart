@@ -11,6 +11,15 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
 
 class HistoricoPage extends StatefulWidget {
+  final int idPerfilSelecionado;
+  final String nomePerfil;
+
+  const HistoricoPage({
+    required this.idPerfilSelecionado,
+    required this.nomePerfil,
+    Key? key,
+  }) : super(key: key);
+
   @override
   _HistoricoPageState createState() => _HistoricoPageState();
 }
@@ -19,7 +28,6 @@ class _HistoricoPageState extends State<HistoricoPage> {
   List<FlSpot> pontosBatimento = [];
   List<String> datas = [];
   bool carregando = true;
-  String perfilSelecionado = 'Jairo Gomes';
 
   @override
   void initState() {
@@ -28,7 +36,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
   }
 
   Future<void> carregarHistorico() async {
-    final url = Uri.parse('http://silvaelias.ddns.net/oxycare/api/historico.php?paciente_id=1');
+    final url = Uri.parse(
+        'http://silvaelias.ddns.net/oxycare/api/historico.php?paciente_id=${widget.idPerfilSelecionado}');
 
     try {
       final resposta = await http.get(url);
@@ -44,7 +53,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
           final item = lista[i];
           final batimentos = (item['batimentos'] as num).toDouble();
           final dataHora = DateTime.parse(item['data_hora']);
-          final data = '${dataHora.day.toString().padLeft(2, '0')}/${dataHora.month.toString().padLeft(2, '0')}/${dataHora.year}';
+          final data =
+              '${dataHora.day.toString().padLeft(2, '0')}/${dataHora.month.toString().padLeft(2, '0')}/${dataHora.year}';
 
           pontosTemp.add(FlSpot(i.toDouble(), batimentos));
           datasTemp.add(data);
@@ -74,7 +84,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
 
     final List<List<dynamic>> rows = [
       ['Data/Hora', 'Batimentos'],
-      for (int i = 0; i < datas.length; i++) [datas[i], pontosBatimento[i].y.toStringAsFixed(2)],
+      for (int i = 0; i < datas.length; i++)
+        [datas[i], pontosBatimento[i].y.toStringAsFixed(2)],
     ];
 
     final csvData = const ListToCsvConverter().convert(rows);
@@ -83,7 +94,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
     final file = File(path);
 
     await file.writeAsString(csvData);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('CSV exportado: $path')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('CSV exportado: $path')));
     await OpenFile.open(path);
   }
 
@@ -93,13 +105,15 @@ class _HistoricoPageState extends State<HistoricoPage> {
       pw.Page(
         build: (pw.Context context) => pw.Column(
           children: [
-            pw.Text('Histórico de Batimentos', style: pw.TextStyle(fontSize: 20)),
+            pw.Text('Histórico de Batimentos',
+                style: pw.TextStyle(fontSize: 20)),
             pw.SizedBox(height: 20),
             pw.Table.fromTextArray(
               context: context,
               data: [
                 ['Data/Hora', 'Batimentos'],
-                for (int i = 0; i < datas.length; i++) [datas[i], pontosBatimento[i].y.toStringAsFixed(2)],
+                for (int i = 0; i < datas.length; i++)
+                  [datas[i], pontosBatimento[i].y.toStringAsFixed(2)],
               ],
             ),
           ],
@@ -112,7 +126,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
     final file = File(path);
 
     await file.writeAsBytes(await pdf.save());
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF exportado: $path')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('PDF exportado: $path')));
     await OpenFile.open(path);
   }
 
@@ -160,7 +175,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
                               getTitlesWidget: (value, meta) {
                                 int idx = value.toInt();
                                 if (idx < datas.length) {
-                                  return Text(datas[idx], style: TextStyle(fontSize: 10));
+                                  return Text(datas[idx],
+                                      style: TextStyle(fontSize: 10));
                                 }
                                 return Text('');
                               },
@@ -199,9 +215,11 @@ class _HistoricoPageState extends State<HistoricoPage> {
                               onPressed: exportarCSV,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
-                              child: Text('Exportar CSV', style: TextStyle(color: Colors.white)),
+                              child: Text('Exportar CSV',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ),
                           SizedBox(width: 10),
@@ -210,9 +228,11 @@ class _HistoricoPageState extends State<HistoricoPage> {
                               onPressed: exportarPDF,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
-                              child: Text('Exportar PDF', style: TextStyle(color: Colors.white)),
+                              child: Text('Exportar PDF',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ),
                         ],
@@ -223,7 +243,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
                           text: 'Perfil Selecionado: ',
                           children: [
                             TextSpan(
-                              text: perfilSelecionado,
+                              text: widget.nomePerfil,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -239,18 +259,20 @@ class _HistoricoPageState extends State<HistoricoPage> {
         currentIndex: 3,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-       onTap: (index) {
-         if (index == 0) Navigator.pushNamed(context, '/envio');
-         if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
-         if (index == 2) Navigator.pushNamed(context, '/conexao');
-         if (index == 3) return;
+        onTap: (index) {
+          if (index == 0) Navigator.pushNamed(context, '/tempoReal');
+          if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
+          if (index == 2) Navigator.pushNamed(context, '/conexao');
         },
-
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.monitor_heart), label: 'Tempo Real'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Perfis'),
-          BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
-          BottomNavigationBarItem(icon: Icon(Icons.access_time), label: 'Histórico'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.monitor_heart), label: 'Tempo Real'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle), label: 'Perfis'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.bluetooth), label: 'Conexão'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.access_time), label: 'Histórico'),
         ],
       ),
     );

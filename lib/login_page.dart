@@ -1,6 +1,10 @@
+
+
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'tempo_real_page.dart'; // Import necessÃ¡rio!
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -37,10 +41,20 @@ class _LoginPageState extends State<LoginPage> {
       final dados = jsonDecode(resposta.body);
 
       if (dados['status'] == 'ok') {
-        Navigator.pushReplacementNamed(context, '/home');
+        // TODO: use os dados reais retornados do login futuramente
+        // Aqui estamos colocando valores fixos para entrar no tempo real
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TempoRealPage(
+              idPerfilSelecionado: 1, // substitua se necessÃ¡rio
+              nomePerfil: 'Paciente Teste', // substitua se necessÃ¡rio
+            ),
+          ),
+        );
       } else {
         setState(() {
-          mensagemErro = dados['mensagem'] ?? 'Login inválido';
+          mensagemErro = dados['mensagem'] ?? 'Login invÃ¡lido';
         });
       }
     } catch (e) {
@@ -80,20 +94,16 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(fontSize: 16, color: Colors.black87),
                 ),
                 const SizedBox(height: 24),
-
-                // Campo Usuário com borda arredondada
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: 'Usuário',
+                    labelText: 'UsuÃ¡rio',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // Campo Senha com borda arredondada
                 TextField(
                   controller: senhaController,
                   obscureText: !_mostrarSenha,
@@ -115,7 +125,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
+                if (mensagemErro != null)
+                  Text(
+                    mensagemErro!,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
@@ -123,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.pushNamed(context, '/recuperar_senha');
                     },
                     child: const Text(
-                      'Forgot password?',
+                      'Esqueceu a senha?',
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 13,
@@ -133,7 +148,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -151,9 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text('Não possui cadastro?', style: TextStyle(color: Colors.black54)),
+                const Text('NÃ£o possui cadastro?', style: TextStyle(color: Colors.black54)),
                 const SizedBox(height: 8),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -179,10 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.black45, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
-                Image.asset(
-                  'assets/ufs_logo_nome_lado.png',
-                  height: 45,
-                ),
+                Image.asset('assets/ufs_logo_nome_lado.png', height: 45),
               ],
             ),
           ),

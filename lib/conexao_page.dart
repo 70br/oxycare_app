@@ -151,7 +151,7 @@ class _ConexaoPageState extends State<ConexaoPage> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
        onTap: (index) {
-         if (index == 0) Navigator.pushNamed(context, '/envio');
+         if (index == 0) Navigator.pushNamed(context, '/tempoReal');
          if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
          if (index == 2) return;
          if (index == 3) Navigator.pushNamed(context, '/historico');

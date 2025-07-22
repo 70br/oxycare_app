@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'login_page.dart';
 import 'cadastro_page.dart';
 import 'sucesso_page.dart';
@@ -9,6 +11,7 @@ import 'listar_perfis_page.dart';
 import 'adicionar_perfil_page.dart';
 import 'historico_page.dart';
 import 'conexao_page.dart';
+import 'tempo_real_page.dart';
 
 void main() => runApp(OxyCareApp());
 
@@ -27,18 +30,24 @@ class OxyCareApp extends StatelessWidget {
         '/cadastro': (context) => CadastroPage(),
         '/sucesso': (context) => SucessoPage(),
         '/monitoramento': (context) => MonitoramentoPage(),
-        '/historico': (context) => HistoricoPage(),
+        '/historico': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return HistoricoPage(
+            idPerfilSelecionado: args['idPerfilSelecionado'],
+            nomePerfil: args['nomePerfil'],
+          );
+        },
         '/listar_perfis': (context) => ListarPerfisPage(),
         '/adicionar_perfil': (context) => AdicionarPerfilPage(),
         '/visualizar_pacientes': (context) => VisualizarPacientesPage(),
         '/adicionar_paciente': (context) => AdicionarPacientePage(),
         '/recuperar_senha': (context) => RecuperarSenhaPage(),
         '/conexao': (context) => ConexaoPage(),
+  //      '/tempoReal': (context) => TempoRealPage(),
       },
     );
   }
 }
-
 
 // ------------------------ TELA INICIAL ------------------------
 
@@ -55,7 +64,26 @@ class TelaInicial extends StatelessWidget {
             child: Text('Monitoramento'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/historico'),
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final id = prefs.getInt('idPerfilSelecionado');
+              final nome = prefs.getString('nomePerfil');
+
+              if (id != null && nome != null) {
+                Navigator.pushNamed(
+                  context,
+                  '/historico',
+                  arguments: {
+                    'idPerfilSelecionado': id,
+                    'nomePerfil': nome,
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Selecione um perfil primeiro.')),
+                );
+              }
+            },
             child: Text('Histórico de Sinais'),
           ),
           ElevatedButton(
@@ -76,7 +104,7 @@ class TelaInicial extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/conexao'),
-            child: Text('conexao'),
+            child: Text('Conexão'),
           ),
         ],
       ),
@@ -181,36 +209,6 @@ class MonitoramentoPage extends StatelessWidget {
     );
   }
 }
-
-//class HistoricoPage extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(title: Text('Histórico de Sinais')),
-//      body: Center(child: Text('Tela Histórico em construção')),
-//    );
-//  }
-//}
-
-// class ListarPerfisPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Listar Perfis')),
-//       body: Center(child: Text('Tela Listar Perfis em construÃ§Ã£o')),
-//     );
-//   }
-// }
-
-// class AdicionarPerfilPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Adicionar Perfil')),
-//       body: Center(child: Text('Tela Adicionar Perfil em construÃ§Ã£o')),
-//     );
-//   }
-// }
 
 class VisualizarPacientesPage extends StatelessWidget {
   @override

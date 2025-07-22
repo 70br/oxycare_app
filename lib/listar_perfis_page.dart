@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListarPerfisPage extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
     final url = Uri.parse('http://silvaelias.ddns.net/oxycare/api/listar_perfis.php');
     try {
       final resposta = await http.get(url);
-      final dados = jsonDecode(resposta.body);
+      final dados = jsonDecode(utf8.decode(resposta.bodyBytes));
 
       if (dados['status'] == 'ok') {
         setState(() {
@@ -40,45 +41,177 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
     }
   }
 
+  Future<Map<String, dynamic>?> obterPerfilSalvo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt('idPerfilSelecionado');
+    final nome = prefs.getString('nomePerfil');
+
+    if (id != null && nome != null) {
+      return {'id': id, 'nome': nome};
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Perfis Cadastrados")),
+      backgroundColor: Color(0xFFFAF6FF),
       body: carregando
           ? Center(child: CircularProgressIndicator())
-          : perfis.isEmpty
-              ? Center(child: Text("Nenhum perfil encontrado"))
-              : ListView.builder(
-                  padding: EdgeInsets.all(16),
-                  itemCount: perfis.length,
-                  itemBuilder: (context, index) {
-                    final perfil = perfis[index];
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 3,
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              perfil['nome'],
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 6),
-                            Text("Sexo: ${perfil['sexo']}"),
-                            Text("Faixa etária: ${perfil['faixa_etaria']}"),
-                            if ((perfil['comorbidades'] ?? '').isNotEmpty)
-                              Text("Comorbidades: ${perfil['comorbidades']}"),
-                          ],
+          : Column(
+              children: [
+                SizedBox(height: 40),
+                Center(child: Image.asset('assets/logo_oxycare.png', height: 40)),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.bluetooth_disabled, color: Colors.red, size: 16),
+                    SizedBox(width: 6),
+                    Text("Não conectado... Clique para conectar", style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+                SizedBox(height: 12),
+                Text("Perfis Cadastrados", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 8),
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: perfis.length,
+                    itemBuilder: (context, index) {
+                      final perfil = perfis[index];
+                      return GestureDetector(
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setInt('idPerfilSelecionado', perfil['id']);
+                          await prefs.setString('nomePerfil', perfil['nome']);
+
+                          Navigator.pop(context, {
+                            'id': perfil['id'],
+                            'nome': perfil['nome'],
+                          });
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(vertical: 6),
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.person, size: 40, color: Colors.blue),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(perfil['nome'] ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    Text("${perfil['sexo'] ?? ''}".toUpperCase()),
+                                    Text("${perfil['faixa_etaria'] ?? 'SEM FAIXA ETÁRIA'}".toUpperCase()),
+                                    Text("${perfil['comorbidades']?.toString().toUpperCase() ?? 'SEM COMORBIDADES'}"),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, '/adicionar_perfil'),
+                        child: Text("Novo Perfil"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
-                    );
-                  },
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Em breve: função de compartilhamento
+                        },
+                        child: Text("Compartilhar Perfis"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Em breve: visualizar pacientes
+                        },
+                        child: Text("Visualizar Pacientes"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        onTap: (index) async {
+          final perfil = await obterPerfilSalvo();
+
+          if (index == 0 && perfil != null) {
+            Navigator.pushNamed(
+              context,
+              '/tempoReal',
+              arguments: {
+                'idPerfilSelecionado': perfil['id'],
+                'nomePerfil': perfil['nome'],
+              },
+            );
+          }
+          if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
+          if (index == 2) Navigator.pushNamed(context, '/conexao');
+          if (index == 3 && perfil != null) {
+            Navigator.pushNamed(
+              context,
+              '/historico',
+              arguments: {
+                'idPerfilSelecionado': perfil['id'],
+                'nomePerfil': perfil['nome'],
+              },
+            );
+          } else if (index == 3 && perfil == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Selecione um perfil primeiro")),
+            );
+          }
+        },
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tempo Real'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
+          BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+        ],
+      ),
     );
   }
 }

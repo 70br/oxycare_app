@@ -1,0 +1,1 @@
+ /home/isaias/oxycare_app/.dart_tool/flutter_build/bc130f66e1379efb6267ddd3b6b0978b/native_assets.yaml: 

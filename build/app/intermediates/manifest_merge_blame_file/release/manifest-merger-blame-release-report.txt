@@ -1,0 +1,206 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.oxycare_app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+8-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="34" />
+9-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml
+10
+11    <!-- Permissões principais -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:6:5-67
+12-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:6:22-64
+13
+14    <!-- Permissões para exportar arquivos (PDF/CSV) -->
+15    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+15-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:9:5-80
+15-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:9:22-77
+16    <uses-permission
+16-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:10:5-11:38
+17        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+17-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:10:22-78
+18        android:maxSdkVersion="28" />
+18-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:11:9-35
+19    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+19-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:12:5-13:40
+19-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:12:22-79
+20
+21    <!-- Permissões para Bluetooth (tela de conexão futura) -->
+22    <uses-permission android:name="android.permission.BLUETOOTH" />
+22-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:16:5-68
+22-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:16:22-65
+23    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+23-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:17:5-74
+23-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:17:22-71
+24    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+24-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:18:5-76
+24-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:18:22-73
+25    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+25-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:19:5-73
+25-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:19:22-70
+26    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+26-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:20:5-79
+26-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:20:22-76
+27
+28    <!-- Visibilidade de intent para plugins de texto -->
+29    <queries>
+29-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:56:5-61:15
+30        <intent>
+30-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:57:9-60:18
+31            <action android:name="android.intent.action.PROCESS_TEXT" />
+31-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:58:13-73
+31-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:58:21-70
+32
+33            <data android:mimeType="text/plain" />
+33-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:59:13-51
+33-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:59:19-48
+34        </intent>
+35    </queries>
+36
+37    <permission
+37-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+38        android:name="com.example.oxycare_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+38-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+39        android:protectionLevel="signature" />
+39-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+40
+41    <uses-permission android:name="com.example.oxycare_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+41-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+41-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+42
+43    <application
+44        android:name="android.app.Application"
+44-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:24:9-42
+45        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+45-->[androidx.core:core:1.9.0] /home/isaias/.gradle/caches/transforms-3/cd029caa73742c9274e432966ee47c8f/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+46        android:icon="@mipmap/ic_launcher"
+46-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:25:9-43
+47        android:label="oxycare_app"
+47-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:23:9-36
+48        android:requestLegacyExternalStorage="true"
+48-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:27:9-52
+49        android:usesCleartextTraffic="true" >
+49-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:26:9-44
+50        <activity
+50-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:29:9-47:20
+51            android:name="com.example.oxycare_app.MainActivity"
+51-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:30:13-41
+52            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+52-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:35:13-163
+53            android:exported="true"
+53-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:31:13-36
+54            android:hardwareAccelerated="true"
+54-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:36:13-47
+55            android:launchMode="singleTop"
+55-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:32:13-43
+56            android:taskAffinity=""
+56-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:33:13-36
+57            android:theme="@style/LaunchTheme"
+57-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:34:13-47
+58            android:windowSoftInputMode="adjustResize" >
+58-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:37:13-55
+59            <meta-data
+59-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:39:13-41:57
+60                android:name="io.flutter.embedding.android.NormalTheme"
+60-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:40:17-72
+61                android:resource="@style/NormalTheme" />
+61-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:41:17-54
+62
+63            <intent-filter>
+63-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:43:13-46:29
+64                <action android:name="android.intent.action.MAIN" />
+64-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:44:17-69
+64-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:44:25-66
+65
+66                <category android:name="android.intent.category.LAUNCHER" />
+66-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:45:17-77
+66-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:45:27-74
+67            </intent-filter>
+68        </activity>
+69
+70        <!-- Obrigatório para Flutter -->
+71        <meta-data
+71-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:50:9-52:33
+72            android:name="flutterEmbedding"
+72-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:51:13-44
+73            android:value="2" />
+73-->/home/isaias/oxycare_app/android/app/src/main/AndroidManifest.xml:52:13-30
+74
+75        <provider
+75-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:11:9-21:20
+76            android:name="com.crazecoder.openfile.FileProvider"
+76-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:12:13-64
+77            android:authorities="com.example.oxycare_app.fileProvider.com.crazecoder.openfile"
+77-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:13:13-88
+78            android:exported="false"
+78-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:14:13-37
+79            android:grantUriPermissions="true"
+79-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:15:13-47
+80            android:requestLegacyExternalStorage="true" >
+80-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:16:13-56
+81            <meta-data
+81-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:18:13-20:53
+82                android:name="android.support.FILE_PROVIDER_PATHS"
+82-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:19:17-67
+83                android:resource="@xml/filepaths" />
+83-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:20:17-50
+84        </provider>
+85        <provider
+85-->[:printing] /home/isaias/oxycare_app/build/printing/intermediates/merged_manifest/release/AndroidManifest.xml:10:9-18:20
+86            android:name="net.nfet.flutter.printing.PrintFileProvider"
+86-->[:printing] /home/isaias/oxycare_app/build/printing/intermediates/merged_manifest/release/AndroidManifest.xml:11:13-71
+87            android:authorities="com.example.oxycare_app.flutter.printing"
+87-->[:printing] /home/isaias/oxycare_app/build/printing/intermediates/merged_manifest/release/AndroidManifest.xml:12:13-68
+88            android:exported="false"
+88-->[:printing] /home/isaias/oxycare_app/build/printing/intermediates/merged_manifest/release/AndroidManifest.xml:13:13-37
+89            android:grantUriPermissions="true" >
+89-->[:printing] /home/isaias/oxycare_app/build/printing/intermediates/merged_manifest/release/AndroidManifest.xml:14:13-47
+90            <meta-data
+90-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:18:13-20:53
+91                android:name="android.support.FILE_PROVIDER_PATHS"
+91-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:19:17-67
+92                android:resource="@xml/flutter_printing_file_paths" />
+92-->[:open_file_android] /home/isaias/oxycare_app/build/open_file_android/intermediates/merged_manifest/release/AndroidManifest.xml:20:17-50
+93        </provider>
+94
+95        <uses-library
+95-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:25:9-27:40
+96            android:name="androidx.window.extensions"
+96-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:26:13-54
+97            android:required="false" />
+97-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:27:13-37
+98        <uses-library
+98-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:28:9-30:40
+99            android:name="androidx.window.sidecar"
+99-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:29:13-51
+100            android:required="false" />
+100-->[androidx.window:window:1.0.0-beta04] /home/isaias/.gradle/caches/transforms-3/f302e75fb7efd781bcf1a29281c188da/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:30:13-37
+101
+102        <provider
+102-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+103            android:name="androidx.startup.InitializationProvider"
+103-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:25:13-67
+104            android:authorities="com.example.oxycare_app.androidx-startup"
+104-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:26:13-68
+105            android:exported="false" >
+105-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:27:13-37
+106            <meta-data
+106-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+107                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+107-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:30:17-75
+108                android:value="androidx.startup" />
+108-->[androidx.emoji2:emoji2:1.2.0] /home/isaias/.gradle/caches/transforms-3/fd5566ded44aaffd1a50ecce95aa3bb6/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:31:17-49
+109            <meta-data
+109-->[androidx.lifecycle:lifecycle-process:2.4.1] /home/isaias/.gradle/caches/transforms-3/cfdc98f5aeae66cfadfcaab37ee52c42/transformed/jetified-lifecycle-process-2.4.1/AndroidManifest.xml:31:13-33:52
+110                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+110-->[androidx.lifecycle:lifecycle-process:2.4.1] /home/isaias/.gradle/caches/transforms-3/cfdc98f5aeae66cfadfcaab37ee52c42/transformed/jetified-lifecycle-process-2.4.1/AndroidManifest.xml:32:17-78
+111                android:value="androidx.startup" />
+111-->[androidx.lifecycle:lifecycle-process:2.4.1] /home/isaias/.gradle/caches/transforms-3/cfdc98f5aeae66cfadfcaab37ee52c42/transformed/jetified-lifecycle-process-2.4.1/AndroidManifest.xml:33:17-49
+112        </provider>
+113    </application>
+114
+115</manifest>

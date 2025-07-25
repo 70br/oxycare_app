@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "net.nfet.flutter.printing-merged_res-10:/layout/notification_template_part_chronometer.xml",
+        "source": "net.nfet.flutter.printing-core-1.6.0-0:/layout/notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "net.nfet.flutter.printing-merged_res-10:/layout/notification_template_part_time.xml",
+        "source": "net.nfet.flutter.printing-core-1.6.0-0:/layout/notification_template_part_time.xml"
+    },
+    {
+        "merged": "net.nfet.flutter.printing-merged_res-10:/layout/custom_dialog.xml",
+        "source": "net.nfet.flutter.printing-core-1.6.0-0:/layout/custom_dialog.xml"
+    }
+]

@@ -1,14 +1,43 @@
+buildscript {
+    ext.kotlin_version = '1.8.22' // Versão do Kotlin compatível com libs
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
+
+    // Correção para versões Kotlin em subprojetos
+    subprojects {
+        afterEvaluate {
+            if (project.plugins.hasPlugin('kotlin-android') || project.plugins.hasPlugin('kotlin-kapt')) {
+                tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                    kotlinOptions {
+                        jvmTarget = "11"       // alterado para JVM 11
+                        apiVersion = "1.8"     // pode continuar assim, não afeta
+                        languageVersion = "1.8"
+                    }
+                }
+            }
+        }
+    }
 }
 
 rootProject.buildDir = "../build"
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }

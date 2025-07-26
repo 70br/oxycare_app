@@ -12,7 +12,8 @@ import 'adicionar_perfil_page.dart';
 import 'historico_page.dart';
 import 'conexao_page.dart';
 import 'tempo_real_page.dart';
-
+import 'tela_selecao_tipo.dart';
+import 'tela_codigo_acesso.dart';
 void main() => runApp(OxyCareApp());
 
 class OxyCareApp extends StatelessWidget {
@@ -44,6 +45,8 @@ class OxyCareApp extends StatelessWidget {
         '/recuperar_senha': (context) => RecuperarSenhaPage(),
         '/conexao': (context) => ConexaoPage(),
   //      '/tempoReal': (context) => TempoRealPage(),
+        '/selecao_tipo': (context) => const TelaSelecaoTipo(),
+        '/codigo_acesso': (context) => const TelaCodigoAcesso(),
       },
     );
   }

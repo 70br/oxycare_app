@@ -13,17 +13,10 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
-if (flutterVersionCode == null) {
-    flutterVersionCode = "1"
-}
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
+def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
-def flutterVersionName = localProperties.getProperty("flutter.versionName")
-if (flutterVersionName == null) {
-    flutterVersionName = "1.0"
-}
-
-// ⬇️ CONFIGURAÇÃO PARA ASSINATURA
+// 🛠️ CONFIGURAÇÃO PARA ASSINATURA
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -33,22 +26,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.example.oxycare_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
-    // ⬇️ CONFIGURAÇÃO DO RELEASE
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    ndkVersion = "26.3.11579264" // ✔ Define explicitamente o NDK instalado
 
     defaultConfig {
         applicationId = "com.example.oxycare_app"
@@ -58,6 +36,26 @@ android {
         versionName = flutterVersionName
     }
 
+    // ⚙️ Ajuste para JVM 11 — importante para resolver conflito Java/Kotlin
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // ⚙️ Configura Kotlin para usar JVM 11 também
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -65,6 +63,15 @@ android {
             minifyEnabled false
         }
     }
+
+    // ✔ (Opcional) Se for usar CMake, descomente abaixo:
+    /*
+    externalNativeBuild {
+        cmake {
+            version "3.18.1"
+        }
+    }
+    */
 }
 
 flutter {

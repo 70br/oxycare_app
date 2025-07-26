@@ -177,7 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
+//                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
+                      onPressed: () => Navigator.pushNamed(context, '/selecao_tipo'),
                     child: const Text(
                       'Criar Conta',
                       style: TextStyle(color: Colors.white),

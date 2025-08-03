@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import  'cadastro_enfermeiro.dart';
 import 'login_page.dart';
 import 'cadastro_page.dart';
 import 'sucesso_page.dart';
@@ -14,6 +14,9 @@ import 'conexao_page.dart';
 import 'tempo_real_page.dart';
 import 'tela_selecao_tipo.dart';
 import 'tela_codigo_acesso.dart';
+import 'cadastro_paciente.dart';
+import 'cadastro_cuidador.dart';
+import 'dashboard_enfermeiro.dart';
 void main() => runApp(OxyCareApp());
 
 class OxyCareApp extends StatelessWidget {
@@ -47,6 +50,15 @@ class OxyCareApp extends StatelessWidget {
   //      '/tempoReal': (context) => TempoRealPage(),
         '/selecao_tipo': (context) => const TelaSelecaoTipo(),
         '/codigo_acesso': (context) => const TelaCodigoAcesso(),
+        '/cadastro_paciente': (context) => const CadastroPacientePage(),
+        '/cadastro_cuidador': (context) {
+  final pacienteId = ModalRoute.of(context)!.settings.arguments as int;
+  return CadastroCuidadorPage(pacienteId: pacienteId);
+},
+
+        '/cadastro_enfermeiro': (context) => const CadastroEnfermeiro(),
+        '/dashboard_enfermeiro': (context) => const DashboardEnfermeiro(),
+       '/codigo_acesso': (context) => const TelaCodigoAcesso(),
       },
     );
   }

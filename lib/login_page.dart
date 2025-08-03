@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: 'UsuÃ¡rio',
+                    labelText: 'Usuario',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text('NÃ£o possui cadastro?', style: TextStyle(color: Colors.black54)),
+                const Text('Não possui cadastro?', style: TextStyle(color: Colors.black54)),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
@@ -193,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.black45, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
-                Image.asset('assets/ufs_logo_nome_lado.png', height: 45),
+                Image.asset('assets/ufs_logo_nome_lado.png', height: 55),
               ],
             ),
           ),

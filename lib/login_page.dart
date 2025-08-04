@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -26,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
       mensagemErro = null;
     });
 
-    final url = Uri.parse('http://silvaelias.ddns.net/oxycare/api/login.php');
+    final url = Uri.parse('https://localhost:8080/api/Auth/login');
 
     try {
       final resposta = await http.post(
@@ -47,14 +44,14 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(
             builder: (context) => TempoRealPage(
-              idPerfilSelecionado: 1, // substitua se necessÃ¡rio
-              nomePerfil: 'Paciente Teste', // substitua se necessÃ¡rio
+              idPerfilSelecionado: 1, // substitua se necessario
+              nomePerfil: 'Paciente Teste', // substitua se necessario
             ),
           ),
         );
       } else {
         setState(() {
-          mensagemErro = dados['mensagem'] ?? 'Login invÃ¡lido';
+          mensagemErro = dados['mensagem'] ?? 'Login invalido';
         });
       }
     } catch (e) {
@@ -97,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: 'Usuario',
+                    labelText: 'Email',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -161,11 +158,13 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: carregando ? null : realizarLogin,
                     child: carregando
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Entrar', style: TextStyle(color: Colors.white)),
+                        : const Text('Entrar',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text('Não possui cadastro?', style: TextStyle(color: Colors.black54)),
+                const Text('Não possui cadastro?',
+                    style: TextStyle(color: Colors.black54)),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
@@ -178,7 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
 //                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
-                      onPressed: () => Navigator.pushNamed(context, '/selecao_tipo'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/selecao_tipo'),
                     child: const Text(
                       'Criar Conta',
                       style: TextStyle(color: Colors.white),

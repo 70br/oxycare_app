@@ -29,7 +29,7 @@ class _CadastroEnfermeiroState extends State<CadastroEnfermeiro> {
 
   void _cadastrar() async {
     if (_formKey.currentState!.validate()) {
-      final url = Uri.parse('http://silvaelias.ddns.net/oxycare/api/cadastrar_enfermeiro.php');
+      final url = Uri.parse('https://localhost:8080/api/Enfermeiro');
 
       final response = await http.post(
         url,
@@ -38,7 +38,7 @@ class _CadastroEnfermeiroState extends State<CadastroEnfermeiro> {
           'nome': _nomeController.text,
           'email': _emailController.text,
           'senha': _senhaController.text,
-          'registro': _registroController.text,
+          'coren': _registroController.text,
         }),
       );
 

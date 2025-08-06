@@ -82,7 +82,7 @@ class _TelaCodigoAcessoState extends State<TelaCodigoAcesso> {
                 labelText: 'Digite o código de acesso',
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 20),
             ElevatedButton(

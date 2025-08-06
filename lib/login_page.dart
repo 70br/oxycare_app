@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'tempo_real_page.dart'; // Import necessÃ¡rio!
+import 'tempo_real_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       final dados = jsonDecode(resposta.body);
 
       if (dados['status'] == 'ok') {
+<<<<<<< HEAD
         // TODO: use os dados reais retornados do login futuramente
         // Aqui estamos colocando valores fixos para entrar no tempo real
         Navigator.pushReplacement(
@@ -46,12 +47,37 @@ class _LoginPageState extends State<LoginPage> {
             builder: (context) => TempoRealPage(
               idPerfilSelecionado: 1, // substitua se necessario
               nomePerfil: 'Paciente Teste', // substitua se necessario
+=======
+        final tipo = dados['tipo'];
+        final nome = dados['nome'];
+        final id = dados['id'];
+
+        if (tipo == 'enfermeiro') {
+          final registro = dados['registro'] ?? '';
+          Navigator.pushReplacementNamed(
+            context,
+            '/dashboard_enfermeiro',
+            arguments: {
+              'nome': nome,
+              'registro': registro,
+            },
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TempoRealPage(
+                idPerfilSelecionado: id,
+                nomePerfil: nome,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } else {
         setState(() {
           mensagemErro = dados['mensagem'] ?? 'Login invalido';
+
+          mensagemErro = dados['mensagem'] ?? 'Login inválido';
         });
       }
     } catch (e) {
@@ -179,6 +205,7 @@ class _LoginPageState extends State<LoginPage> {
 //                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
                     onPressed: () =>
                         Navigator.pushNamed(context, '/selecao_tipo'),
+                    onPressed: () => Navigator.pushNamed(context, '/selecao_tipo'),
                     child: const Text(
                       'Criar Conta',
                       style: TextStyle(color: Colors.white),

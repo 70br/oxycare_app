@@ -17,6 +17,9 @@ import 'tela_codigo_acesso.dart';
 import 'cadastro_paciente.dart';
 import 'cadastro_cuidador.dart';
 import 'dashboard_enfermeiro.dart';
+import 'cadastrar_paciente_enfermeiro.dart';
+import 'gerar_codigo_cuidador.dart';
+import 'visualizar_pacientes_cuidadores.dart';
 void main() => runApp(OxyCareApp());
 
 class OxyCareApp extends StatelessWidget {
@@ -42,6 +45,11 @@ class OxyCareApp extends StatelessWidget {
           );
         },
         '/listar_perfis': (context) => ListarPerfisPage(),
+        '/dashboard_enfermeiro': (context) => const DashboardEnfermeiro(),
+        '/cadastrar_paciente_enfermeiro': (context) => CadastrarPacienteEnfermeiroPage(), // ← você vai criar essa
+        '/gerar_codigo_cuidador': (context) => GerarCodigoCuidadorPage(),                 // ← você vai criar essa
+        '/visualizar_pacientes_cuidadores': (context) => VisualizarPacientesCuidadoresPage(), // ← você vai criar essa
+
         '/adicionar_perfil': (context) => AdicionarPerfilPage(),
         '/visualizar_pacientes': (context) => VisualizarPacientesPage(),
         '/adicionar_paciente': (context) => AdicionarPacientePage(),

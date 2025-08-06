@@ -1,55 +1,122 @@
 import 'package:flutter/material.dart';
+import 'tempo_real_page.dart';
+import 'historico_page.dart';
 
 class DashboardEnfermeiro extends StatelessWidget {
   const DashboardEnfermeiro({super.key});
 
-  void _verPacientes(BuildContext context) {
-    // Aqui você pode navegar para a tela de pacientes (crie depois)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Função ainda não implementada.")),
-    );
-  }
-
-  void _sair(BuildContext context) {
-    // Volta para a tela de login ou tipo de seleção
-    Navigator.pushNamedAndRemoveUntil(context, '/tela_selecao_tipo', (route) => false);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    final String nome = args?['nome'] ?? 'Enfermeiro';
+    final String registro = args?['registro'] ?? '';
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Bem-vindo(a), Enfermeiro(a)!")),
+      appBar: AppBar(
+        title: const Text("Área do Enfermeiro"),
+        backgroundColor: Colors.blue,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.asset('assets/logo_oxycare.png', height: 60),
+            const SizedBox(height: 20),
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    "Bem-vindo, $nome",
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  if (registro.isNotEmpty)
+                    Text(
+                      "Registro: $registro",
+                      style: const TextStyle(fontSize: 16, color: Colors.black87),
+                    ),
+                ],
+              ),
+            ),
             const SizedBox(height: 40),
-            const Text(
-              "Cadastro realizado com sucesso!",
-              style: TextStyle(fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/cadastrar_paciente_enfermeiro');
+              },
+              icon: const Icon(Icons.person_add),
+              label: const Text("Cadastrar Novo Paciente + Gerar Código"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-              ),
-              onPressed: () => _verPacientes(context),
-              child: const Text(
-                "Ver Pacientes",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                backgroundColor: Colors.teal,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 60),
               ),
             ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => _sair(context),
-              child: const Text("Sair"),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/gerar_codigo_cuidador');
+              },
+              icon: const Icon(Icons.qr_code),
+              label: const Text("Gerar Código para Cuidador"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 60),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/visualizar_pacientes_cuidadores');
+              },
+              icon: const Icon(Icons.people),
+              label: const Text("Visualizar Pacientes e Cuidadores"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 60),
+              ),
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        onTap: (index) async {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TempoRealPage(
+                  idPerfilSelecionado: 1, // pode ser ajustado
+                  nomePerfil: nome,
+                ),
+              ),
+            );
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/listar_perfis');
+          } else if (index == 2) {
+            Navigator.pushNamed(context, '/conexao');
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HistoricoPage(
+                  idPerfilSelecionado: 1, // pode ser ajustado
+                  nomePerfil: nome,
+                ),
+              ),
+            );
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tempo Real'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
+          BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+        ],
       ),
     );
   }

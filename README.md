@@ -200,3 +200,42 @@ Este projeto acadêmico foi desenvolvido com foco em usabilidade, conectividade 
 > Desenvolvido com dedicação por alunos da Universidade Federal de Sergipe 💙
 
 OBS: Este backend foi desenvolvido em PHP apenas para fins de teste e validação inicial. No entanto, poderá ser substituído futuramente por outra API construída com tecnologias diferentes, conforme a evolução do projeto e suas necessidades.
+---
+
+### 🚀 Fluxo Atual Implementado – 05/08/Agosto 2025
+
+> Este fluxo segue ** o PDF do Fluxo de Autenticação enviado pelo grupo**.
+
+**✅ Login:**
+- Login funcional para:
+  - Paciente
+  - Cuidador
+  - Enfermeiro
+- Redirecionamento:
+  - Paciente/Cuidador → monitoramento em tempo real.
+  - Enfermeiro → painel de gerenciamento (dashboard_enfermeiro).
+
+**✅ Cadastro seguindo o fluxo do PDF:**
+- Seleção de tipo de usuário (Paciente/Cuidador ou Enfermeiro)
+- Paciente/Cuidador:
+  - Inserem o código gerado pelo enfermeiro.
+  - Fazem cadastro com vínculo.
+- Enfermeiro:
+  - Informa nome, email, senha e CRM/COREN.
+  - Acesso ao painel de controle.
+
+**✅ Painel do Enfermeiro:**
+- Botões:
+  - Cadastrar paciente + gerar código
+  - Gerar código para cuidador
+  - Visualizar pacientes e cuidadores
+- Barra inferior com acesso a:
+  - Tempo Real
+  - Perfis
+  - Conexão
+  - Histórico
+
+**🔜 Próximas etapas:**
+- Enfermeiro visualizar dados em tempo real de qualquer paciente listado.
+- Ajustes visuais finais para apresentação do MVP.
+

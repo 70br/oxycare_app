@@ -9,6 +9,7 @@ import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // ADICIONADO
 
 class HistoricoPage extends StatefulWidget {
   final int idPerfilSelecionado;
@@ -28,11 +29,20 @@ class _HistoricoPageState extends State<HistoricoPage> {
   List<FlSpot> pontosBatimento = [];
   List<String> datas = [];
   bool carregando = true;
+  String? tipoUsuario; // ADICIONADO
 
   @override
   void initState() {
     super.initState();
     carregarHistorico();
+    carregarTipoUsuario(); // ADICIONADO
+  }
+
+  Future<void> carregarTipoUsuario() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      tipoUsuario = prefs.getString('tipoUsuario') ?? '';
+    });
   }
 
   Future<void> carregarHistorico() async {
@@ -259,20 +269,34 @@ class _HistoricoPageState extends State<HistoricoPage> {
         currentIndex: 3,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
+        onTap: (index) async {
           if (index == 0) Navigator.pushNamed(context, '/tempoReal');
           if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
           if (index == 2) Navigator.pushNamed(context, '/conexao');
+          if (index == 4) {
+            // Mostrar Dashboard só se for enfermeiro
+            if (tipoUsuario == 'enfermeiro') {
+              Navigator.pushReplacementNamed(context, '/dashboard_enfermeiro');
+            } else {
+              // Se não for enfermeiro, pode mostrar um aviso ou nada
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Acesso ao Dashboard restrito.')),
+              );
+            }
+          }
         },
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.monitor_heart), label: 'Tempo Real'),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.account_circle), label: 'Perfis'),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.bluetooth), label: 'Conexão'),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.access_time), label: 'Histórico'),
+          if (tipoUsuario == 'enfermeiro') // EXIBE SÓ PARA ENFERMEIRO
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
       ),
     );

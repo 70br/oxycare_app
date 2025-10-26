@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ConexaoPage extends StatefulWidget {
+  final bool voltarParaDashboard; // NOVO
+
+  const ConexaoPage({Key? key, this.voltarParaDashboard = false}) : super(key: key);
+
   @override
   _ConexaoPageState createState() => _ConexaoPageState();
 }
@@ -11,6 +16,10 @@ class _ConexaoPageState extends State<ConexaoPage> {
   bool escaneando = false;
   bool conectado = false;
 
+  // NOVO: variáveis de status e cor
+  String statusConexao = "Não conectado... Clique para conectar";
+  Color corStatus = Colors.red;
+
   @override
   void initState() {
     super.initState();
@@ -18,6 +27,8 @@ class _ConexaoPageState extends State<ConexaoPage> {
       if (state == BluetoothAdapterState.off) {
         setState(() {
           conectado = false;
+          statusConexao = "Não conectado... Clique para conectar";
+          corStatus = Colors.red;
         });
       }
     });
@@ -27,6 +38,9 @@ class _ConexaoPageState extends State<ConexaoPage> {
     setState(() {
       escaneando = true;
       dispositivos.clear();
+      // NOVO: muda status para laranja "Escaneando..."
+      statusConexao = "Escaneando...";
+      corStatus = Colors.orange;
     });
 
     await FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
@@ -40,9 +54,18 @@ class _ConexaoPageState extends State<ConexaoPage> {
     await Future.delayed(Duration(seconds: 4));
     FlutterBluePlus.stopScan();
 
-    setState(() {
-      escaneando = false;
-    });
+    // NOVO: se não conectou e terminou scan
+    if (!conectado) {
+      setState(() {
+        escaneando = false;
+        statusConexao = "Não conectado... Clique para conectar";
+        corStatus = Colors.red;
+      });
+    } else {
+      setState(() {
+        escaneando = false;
+      });
+    }
   }
 
   void conectarDispositivo(BluetoothDevice device) async {
@@ -50,6 +73,9 @@ class _ConexaoPageState extends State<ConexaoPage> {
       await device.connect();
       setState(() {
         conectado = true;
+        // NOVO: muda status para verde conectado
+        statusConexao = "Conectado ao PROTOTIPO";
+        corStatus = Colors.green;
       });
     } catch (e) {
       print('Erro ao conectar: $e');
@@ -70,11 +96,11 @@ class _ConexaoPageState extends State<ConexaoPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.circle, size: 12, color: conectado ? Colors.green : Colors.red),
+                Icon(Icons.circle, size: 12, color: corStatus),
                 SizedBox(width: 6),
                 Text(
-                  conectado ? 'Conectado com sucesso' : 'Não conectado… Clique para conectar',
-                  style: TextStyle(fontSize: 14),
+                  statusConexao,
+                  style: TextStyle(fontSize: 14, color: corStatus),
                 ),
               ],
             ),
@@ -150,17 +176,56 @@ class _ConexaoPageState extends State<ConexaoPage> {
         currentIndex: 2,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-       onTap: (index) {
-         if (index == 0) Navigator.pushNamed(context, '/tempoReal');
-         if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
-         if (index == 2) return;
-         if (index == 3) Navigator.pushNamed(context, '/historico');
+        onTap: (index) async {
+          final prefs = await SharedPreferences.getInstance();
+          final idPerfil = prefs.getInt('idPerfilSelecionado');
+          final nomePerfil = prefs.getString('nomePerfil');
+
+          if (index == 0) {
+            if (idPerfil != null && nomePerfil != null) {
+              Navigator.pushReplacementNamed(
+                context,
+                '/tempoReal',
+                arguments: {
+                  'idPerfilSelecionado': idPerfil,
+                  'nomePerfil': nomePerfil,
+                },
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Selecione um perfil antes de acessar Tempo Real')),
+              );
+            }
+          } else if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/listar_perfis');
+          } else if (index == 2) {
+            return;
+          } else if (index == 3) {
+            if (idPerfil != null && nomePerfil != null) {
+              Navigator.pushReplacementNamed(
+                context,
+                '/historico',
+                arguments: {
+                  'idPerfilSelecionado': idPerfil,
+                  'nomePerfil': nomePerfil,
+                },
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Selecione um perfil antes de acessar Histórico')),
+              );
+            }
+          } else if (widget.voltarParaDashboard && index == 4) {
+            Navigator.pushReplacementNamed(context, '/dashboard_enfermeiro');
+          }
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tempo Real'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
           BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+          if (widget.voltarParaDashboard)
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
       ),
     );

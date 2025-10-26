@@ -1,6 +1,6 @@
 name: oxycare_app
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   http: ^1.4.0
   cupertino_icons: ^1.0.6
-  fl_chart: ^1.0.0          # atualizei pra última versão estável disponível
+  fl_chart: ^1.0.0
   csv: ^6.0.0
   path_provider: ^2.0.15
   permission_handler: ^12.0.1
@@ -33,10 +33,13 @@ flutter:
   uses-material-design: true
   assets:
     - assets/ufs_logo_nome_lado.png
-    - assets/logo_oxycare.png
+    - assets/logo_cuidar.png
+    - assets/sounds/alert.mp3
 
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/logo.png"
   min_sdk_android: 21

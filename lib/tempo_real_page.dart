@@ -4,15 +4,18 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:audioplayers/audioplayers.dart';
 import 'historico_page.dart';
 
 class TempoRealPage extends StatefulWidget {
   final int idPerfilSelecionado;
   final String nomePerfil;
+  final bool voltarParaDashboard;
 
   const TempoRealPage({
     required this.idPerfilSelecionado,
     required this.nomePerfil,
+    this.voltarParaDashboard = false,
     Key? key,
   }) : super(key: key);
 
@@ -36,12 +39,18 @@ class _TempoRealPageState extends State<TempoRealPage> {
   final Guid uuidServico = Guid("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
   final Guid uuidCaracteristica = Guid("6E400002-B5A3-F393-E0A9-E50E24DCCA9E");
 
+  // ALERTA - controle para evitar repetição
+  String? ultimoAlerta;
+
+  // Player de som
+  //final AudioPlayer _audioPlayer = AudioPlayer();
+
   @override
   void initState() {
     super.initState();
     idPerfilSelecionado = widget.idPerfilSelecionado;
     nomePerfil = widget.nomePerfil;
-    salvarPerfilLocal(idPerfilSelecionado, nomePerfil); // novo
+    salvarPerfilLocal(idPerfilSelecionado, nomePerfil);
     iniciarBluetooth();
   }
 
@@ -101,10 +110,69 @@ class _TempoRealPageState extends State<TempoRealPage> {
         ultimaAtualizacao = DateTime.now().toString().substring(0, 19).replaceFirst('T', ' às ');
       });
 
+      // ALERTA - verifica se há valores críticos
+      verificarAlerta(bpm, spo2, temp);
+
       enviarParaServidor(bpm, spo2, temp);
     } catch (e) {
       print("Erro ao processar dados recebidos: $e");
     }
+  }
+
+  void verificarAlerta(int bpm, int spo2, double temp) {
+    String? alerta;
+
+    if (bpm > 120) {
+      alerta = "Frequência cardíaca alta: $bpm bpm";
+    } else if (bpm < 50) {
+      alerta = "Frequência cardíaca baixa: $bpm bpm";
+    } else if (temp > 38.0) {
+      alerta = "Temperatura alta: ${temp.toStringAsFixed(1)}°C";
+    } else if (spo2 < 92) {
+      alerta = "Nível de oxigênio baixo: $spo2%";
+    }
+
+    if (alerta != null && alerta != ultimoAlerta) {
+      ultimoAlerta = alerta;
+      tocarSomAlerta();
+      mostrarModalAlerta(alerta);
+    }
+  }
+
+  void tocarSomAlerta() async {
+    try {
+    //  await _audioPlayer.play(AssetSource('sounds/alert.mp3'));
+    } catch (e) {
+      print("Erro ao tocar som: $e");
+    }
+  }
+
+  void mostrarModalAlerta(String mensagem) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red, size: 28),
+              SizedBox(width: 8),
+              Text("Atenção!", style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          content: Text(
+            mensagem,
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK", style: TextStyle(color: Colors.blue)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> enviarParaServidor(int bpm, int spo2, double temp) async {
@@ -142,16 +210,19 @@ class _TempoRealPageState extends State<TempoRealPage> {
           SizedBox(height: 40),
           Center(child: Image.asset('assets/logo_oxycare.png', height: 40)),
           SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.circle, size: 12, color: conectado ? Colors.green : Colors.red),
-              SizedBox(width: 6),
-              Text(
-                conectado ? 'Conectado ao PROTOTIPO' : 'Não conectado... Aguarde conexão',
-                style: TextStyle(fontSize: 14),
-              ),
-            ],
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/conexao'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.circle, size: 12, color: conectado ? Colors.green : Colors.red),
+                SizedBox(width: 6),
+                Text(
+                  conectado ? 'Conectado ao PROTOTIPO' : 'Não conectado... Clique para conectar',
+                  style: TextStyle(fontSize: 14, color: conectado ? Colors.green : Colors.red),
+                ),
+              ],
+            ),
           ),
           SizedBox(height: 12),
           _buildCard("Freq. Cardíaca", frequenciaCardiaca.toString(), "bpm", Icons.favorite, Colors.pink),
@@ -211,12 +282,21 @@ class _TempoRealPageState extends State<TempoRealPage> {
               ),
             );
           }
+          if (widget.voltarParaDashboard && index == 4) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/dashboard_enfermeiro',
+              arguments: {'nome': widget.nomePerfil},
+            );
+          }
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tempo Real'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
           BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+          if (widget.voltarParaDashboard)
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
       ),
     );

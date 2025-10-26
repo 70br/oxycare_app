@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'home_page.dart';
-import 'cadastro_usuario_page.dart';
+import 'tempo_real_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,8 +23,7 @@ class _LoginPageState extends State<LoginPage> {
       mensagemErro = null;
     });
 
-    // ✅ Mantido o endpoint que você disse que está funcionando
-    final url = Uri.parse('http://silvaelias.ddns.net:8080/api/Auth/login');
+    final url = Uri.parse('https://localhost:8080/api/Auth/login');
 
     try {
       final resposta = await http.post(
@@ -38,50 +35,57 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
-      if (resposta.statusCode == 200) {
-        final dados = jsonDecode(resposta.body);
+      final dados = jsonDecode(resposta.body);
 
-        final accessToken = dados['accessToken'];
-        final refreshToken = dados['refreshToken'];
-        final expiresAt = dados['expiresAt'];
-        final refreshExpiresAt = dados['refreshTokenExpiresAt'];
+      if (dados['status'] == 'ok') {
+<<<<<<< HEAD
+        // TODO: use os dados reais retornados do login futuramente
+        // Aqui estamos colocando valores fixos para entrar no tempo real
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TempoRealPage(
+              idPerfilSelecionado: 1, // substitua se necessario
+              nomePerfil: 'Paciente Teste', // substitua se necessario
+=======
+        final tipo = dados['tipo'];
+        final nome = dados['nome'];
+        final id = dados['id'];
 
-        // Decodifica o payload do JWT para pegar nome e email
-        final partes = accessToken.split('.');
-        if (partes.length == 3) {
-          final payload = utf8.decode(base64Url.decode(base64Url.normalize(partes[1])));
-          final info = jsonDecode(payload);
-          final nomeUsuario = info['name'] ?? 'Usuário';
-          final emailUsuario = info['email'] ?? emailController.text.trim();
-
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('nomeUsuario', nomeUsuario);
-          await prefs.setString('emailUsuario', emailUsuario);
-        }
-
-        // Salva tokens no dispositivo
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('accessToken', accessToken);
-        await prefs.setString('refreshToken', refreshToken);
-        await prefs.setString('expiresAt', expiresAt);
-        await prefs.setString('refreshTokenExpiresAt', refreshExpiresAt);
-
-        if (mounted) {
+        if (tipo == 'enfermeiro') {
+          final registro = dados['registro'] ?? '';
+          Navigator.pushReplacementNamed(
+            context,
+            '/dashboard_enfermeiro',
+            arguments: {
+              'nome': nome,
+              'registro': registro,
+            },
+          );
+        } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
+            MaterialPageRoute(
+              builder: (context) => TempoRealPage(
+                idPerfilSelecionado: id,
+                nomePerfil: nome,
+              ),
+>>>>>>> 01353b4 (Implementa fluxo do PDF: login, cadastros, dashboard e atualiza README)
+            ),
           );
         }
       } else {
-        // ✅ Ajustado para tratar formato ProblemDetails do .NET
-        final erro = jsonDecode(resposta.body);
         setState(() {
-          mensagemErro = erro['detail'] ?? erro['mensagem'] ?? 'Falha ao fazer login';
+<<<<<<< HEAD
+          mensagemErro = dados['mensagem'] ?? 'Login invalido';
+=======
+          mensagemErro = dados['mensagem'] ?? 'Login inválido';
+>>>>>>> 01353b4 (Implementa fluxo do PDF: login, cadastros, dashboard e atualiza README)
         });
       }
     } catch (e) {
       setState(() {
-        mensagemErro = 'Erro de conexão com o servidor';
+        mensagemErro = 'Erro ao conectar com o servidor';
       });
     }
 
@@ -100,14 +104,13 @@ class _LoginPageState extends State<LoginPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Image.asset('assets/logo_cuidar.png', height: 140),
+                Image.asset('assets/logo_oxycare.png', height: 140),
                 const SizedBox(height: 12),
-                // ✅ Nome aumentado
                 const Text(
-                  'Cuidar+',
+                  'OxyCare',
                   style: TextStyle(
-                    fontSize: 28, // aumentado de 22 → 28
-                    color: Colors.blueAccent,
+                    fontSize: 22,
+                    color: Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -151,13 +154,15 @@ class _LoginPageState extends State<LoginPage> {
                 if (mensagemErro != null)
                   Text(
                     mensagemErro!,
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: Colors.red),
                   ),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/recuperar_senha'),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/recuperar_senha');
+                    },
                     child: const Text(
                       'Esqueceu a senha?',
                       style: TextStyle(
@@ -174,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -186,7 +191,10 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(color: Colors.white)),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+                const Text('Não possui cadastro?',
+                    style: TextStyle(color: Colors.black54)),
+                const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -197,16 +205,15 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const CadastroUsuarioPage(),
-                        ),
-                      );
-                    },
+<<<<<<< HEAD
+//                    onPressed: () => Navigator.pushNamed(context, '/cadastro'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/selecao_tipo'),
+=======
+                    onPressed: () => Navigator.pushNamed(context, '/selecao_tipo'),
+>>>>>>> 01353b4 (Implementa fluxo do PDF: login, cadastros, dashboard e atualiza README)
                     child: const Text(
-                      'Cadastrar-se',
+                      'Criar Conta',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

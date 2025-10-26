@@ -2,71 +2,101 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import  'cadastro_enfermeiro.dart';
+
 import 'login_page.dart';
-import 'cadastro_page.dart';
-import 'sucesso_page.dart';
 import 'recuperar_senha_page.dart';
+import 'tela_selecao_tipo.dart';
+import 'tempo_real_page.dart';
+import 'historico_page.dart';
 import 'listar_perfis_page.dart';
 import 'adicionar_perfil_page.dart';
-import 'historico_page.dart';
+import 'cadastro_page.dart';
+import 'sucesso_page.dart';
 import 'conexao_page.dart';
-import 'tempo_real_page.dart';
-import 'tela_selecao_tipo.dart';
-import 'tela_codigo_acesso.dart';
+import 'cadastro_enfermeiro.dart';
 import 'cadastro_paciente.dart';
 import 'cadastro_cuidador.dart';
 import 'dashboard_enfermeiro.dart';
 import 'cadastrar_paciente_enfermeiro.dart';
 import 'gerar_codigo_cuidador.dart';
 import 'visualizar_pacientes_cuidadores.dart';
-void main() => runApp(OxyCareApp());
+import 'tela_codigo_acesso.dart';
+import 'cadastro_usuario_page.dart'; // nova tela
+import 'listar_usuarios_page.dart';
+import 'home_page.dart';
 
-class OxyCareApp extends StatelessWidget {
+void main() => runApp(const CuidarApp());
+
+class CuidarApp extends StatelessWidget {
+  const CuidarApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OxyCare',
-      theme: ThemeData(primarySwatch: Colors.teal),
+      title: 'Cuidar+',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
-        '/home': (context) => TelaInicial(),
-        '/envio': (context) => EnvioDadosPage(),
+        '/': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
         '/cadastro': (context) => CadastroPage(),
+        '/cadastro_usuario': (context) => const CadastroUsuarioPage(),
         '/sucesso': (context) => SucessoPage(),
-        '/monitoramento': (context) => MonitoramentoPage(),
-        '/historico': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return HistoricoPage(
-            idPerfilSelecionado: args['idPerfilSelecionado'],
-            nomePerfil: args['nomePerfil'],
-          );
-        },
-        '/listar_perfis': (context) => ListarPerfisPage(),
-        '/dashboard_enfermeiro': (context) => const DashboardEnfermeiro(),
-        '/cadastrar_paciente_enfermeiro': (context) => CadastrarPacienteEnfermeiroPage(), // ← você vai criar essa
-        '/gerar_codigo_cuidador': (context) => GerarCodigoCuidadorPage(),                 // ← você vai criar essa
-        '/visualizar_pacientes_cuidadores': (context) => VisualizarPacientesCuidadoresPage(), // ← você vai criar essa
-
-        '/adicionar_perfil': (context) => AdicionarPerfilPage(),
-        '/visualizar_pacientes': (context) => VisualizarPacientesPage(),
-        '/adicionar_paciente': (context) => AdicionarPacientePage(),
         '/recuperar_senha': (context) => RecuperarSenhaPage(),
-        '/conexao': (context) => ConexaoPage(),
-  //      '/tempoReal': (context) => TempoRealPage(),
         '/selecao_tipo': (context) => const TelaSelecaoTipo(),
         '/codigo_acesso': (context) => const TelaCodigoAcesso(),
+        '/listar_perfis': (context) => ListarPerfisPage(),
+        '/adicionar_perfil': (context) => AdicionarPerfilPage(),
+        '/conexao': (context) => ConexaoPage(),
         '/cadastro_paciente': (context) => const CadastroPacientePage(),
-        '/cadastro_cuidador': (context) {
-  final pacienteId = ModalRoute.of(context)!.settings.arguments as int;
-  return CadastroCuidadorPage(pacienteId: pacienteId);
-},
-
         '/cadastro_enfermeiro': (context) => const CadastroEnfermeiro(),
         '/dashboard_enfermeiro': (context) => const DashboardEnfermeiro(),
-       '/codigo_acesso': (context) => const TelaCodigoAcesso(),
+        '/cadastrar_paciente_enfermeiro': (context) =>
+            CadastrarPacienteEnfermeiroPage(),
+        '/gerar_codigo_cuidador': (context) => GerarCodigoCuidadorPage(),
+        '/visualizar_pacientes_cuidadores': (context) =>
+            VisualizarPacientesCuidadoresPage(),
+        '/listar_usuarios': (context) => const ListarUsuariosPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/tempoReal') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          if (args != null &&
+              args.containsKey('idPerfilSelecionado') &&
+              args.containsKey('nomePerfil')) {
+            return MaterialPageRoute(
+              builder: (context) => TempoRealPage(
+                idPerfilSelecionado: args['idPerfilSelecionado'],
+                nomePerfil: args['nomePerfil'],
+              ),
+            );
+          } else {
+            return MaterialPageRoute(builder: (context) => ListarPerfisPage());
+          }
+        }
+
+        if (settings.name == '/historico') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => HistoricoPage(
+              idPerfilSelecionado: args['idPerfilSelecionado'],
+              nomePerfil: args['nomePerfil'],
+            ),
+          );
+        }
+
+        if (settings.name == '/cadastro_cuidador') {
+          final pacienteId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => CadastroCuidadorPage(pacienteId: pacienteId),
+          );
+        }
+
+        return null;
       },
     );
   }
@@ -75,180 +105,76 @@ class OxyCareApp extends StatelessWidget {
 // ------------------------ TELA INICIAL ------------------------
 
 class TelaInicial extends StatelessWidget {
+  const TelaInicial({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('refreshToken');
+
+    if (token == null) {
+      Navigator.pushReplacementNamed(context, '/');
+      return;
+    }
+
+    final url = Uri.parse('http://silvaelias.ddns.net:5000/api/Auth/logout');
+
+    try {
+      await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'refreshToken': token}),
+      );
+    } catch (_) {}
+
+    await prefs.clear();
+    Navigator.pushReplacementNamed(context, '/');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Tela Inicial')),
+      appBar: AppBar(
+        title: const Text('Cuidar+ - Início'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          )
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/envio'),
-            child: Text('Monitoramento'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              final id = prefs.getInt('idPerfilSelecionado');
-              final nome = prefs.getString('nomePerfil');
-
-              if (id != null && nome != null) {
-                Navigator.pushNamed(
-                  context,
-                  '/historico',
-                  arguments: {
-                    'idPerfilSelecionado': id,
-                    'nomePerfil': nome,
-                  },
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Selecione um perfil primeiro.')),
-                );
-              }
-            },
-            child: Text('Histórico de Sinais'),
+            onPressed: () => Navigator.pushNamed(context, '/tempoReal'),
+            child: const Text('Monitoramento em Tempo Real'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/listar_perfis'),
-            child: Text('Listar Perfis'),
+            child: const Text('Listar Perfis'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/historico'),
+            child: const Text('Histórico de Sinais'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/adicionar_perfil'),
-            child: Text('Adicionar Perfil'),
+            child: const Text('Adicionar Perfil'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/visualizar_pacientes'),
-            child: Text('Visualizar Pacientes'),
+            onPressed: () => Navigator.pushNamed(
+                context, '/visualizar_pacientes_cuidadores'),
+            child: const Text('Pacientes e Cuidadores'),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/adicionar_paciente'),
-            child: Text('Adicionar Paciente'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/conexao'),
-            child: Text('Conexão'),
+          const SizedBox(height: 20),
+          const Divider(),
+          const Text(
+            'Sistema de Monitoramento de Saúde - Cuidar+',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),
-    );
-  }
-}
-
-// ------------------------ ENVIO DE DADOS ------------------------
-
-class EnvioDadosPage extends StatefulWidget {
-  @override
-  _EnvioDadosPageState createState() => _EnvioDadosPageState();
-}
-
-class _EnvioDadosPageState extends State<EnvioDadosPage> {
-  final TextEditingController batimentosController = TextEditingController();
-  final TextEditingController spo2Controller = TextEditingController();
-  final TextEditingController temperaturaController = TextEditingController();
-
-  Future<void> enviarDados() async {
-    final uri = Uri.parse('http://silvaelias.ddns.net/oxycare/api/receber_dados.php');
-    final dados = {
-      "paciente_id": 1,
-      "batimentos": int.tryParse(batimentosController.text) ?? 0,
-      "spo2": int.tryParse(spo2Controller.text) ?? 0,
-      "temperatura": double.tryParse(temperaturaController.text) ?? 0.0,
-    };
-
-    try {
-      final resposta = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(dados),
-      );
-
-      if (resposta.statusCode == 200) {
-        final respostaJson = jsonDecode(resposta.body);
-        if (respostaJson['status'] == 'ok') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Dados enviados com sucesso!')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao enviar: ${respostaJson['mensagem']}')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro de conexão (${resposta.statusCode})')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao conectar com o servidor.')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Envio de Sinais Vitais")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: batimentosController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Batimentos (bpm)'),
-            ),
-            TextField(
-              controller: spo2Controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'SpO₂ (%)'),
-            ),
-            TextField(
-              controller: temperaturaController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Temperatura (°C)'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: enviarDados,
-              child: Text('Enviar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ------------------------ TELAS TEMPORÁRIAS ------------------------
-
-class MonitoramentoPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Monitoramento')),
-      body: Center(child: Text('Tela Monitoramento em construção')),
-    );
-  }
-}
-
-class VisualizarPacientesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Visualizar Pacientes')),
-      body: Center(child: Text('Tela Visualizar Pacientes em construção')),
-    );
-  }
-}
-
-class AdicionarPacientePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Adicionar Paciente')),
-      body: Center(child: Text('Tela Adicionar Paciente em construção')),
     );
   }
 }

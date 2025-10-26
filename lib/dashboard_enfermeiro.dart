@@ -7,9 +7,14 @@ class DashboardEnfermeiro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-    final String nome = args?['nome'] ?? 'Enfermeiro';
-    final String registro = args?['registro'] ?? '';
+    final args = ModalRoute.of(context)?.settings.arguments;
+    String nome = 'Enfermeiro';
+    String registro = '';
+
+    if (args is Map<String, dynamic>) {
+      nome = args['nome'] ?? 'Enfermeiro';
+      registro = args['registro'] ?? '';
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -81,17 +86,18 @@ class DashboardEnfermeiro extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
+        currentIndex: 4, // Novo índice para dashboard
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-        onTap: (index) async {
+        onTap: (index) {
           if (index == 0) {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => TempoRealPage(
-                  idPerfilSelecionado: 1, // pode ser ajustado
+                  idPerfilSelecionado: 1,
                   nomePerfil: nome,
+                  voltarParaDashboard: true, // parâmetro de retorno
                 ),
               ),
             );
@@ -104,10 +110,16 @@ class DashboardEnfermeiro extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => HistoricoPage(
-                  idPerfilSelecionado: 1, // pode ser ajustado
+                  idPerfilSelecionado: 1,
                   nomePerfil: nome,
                 ),
               ),
+            );
+          } else if (index == 4) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/dashboard_enfermeiro',
+              arguments: {'nome': nome, 'registro': registro},
             );
           }
         },
@@ -116,6 +128,7 @@ class DashboardEnfermeiro extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
           BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
       ),
     );

@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Importação da tela TempoRealPage (ajuste o caminho conforme seu projeto)
+import 'package:oxycare_app/tempo_real_page.dart';
+
 class ListarPerfisPage extends StatefulWidget {
   @override
   _ListarPerfisPageState createState() => _ListarPerfisPageState();
@@ -11,11 +14,20 @@ class ListarPerfisPage extends StatefulWidget {
 class _ListarPerfisPageState extends State<ListarPerfisPage> {
   List<dynamic> perfis = [];
   bool carregando = true;
+  String? tipoUsuario; // ADICIONADO
 
   @override
   void initState() {
     super.initState();
     carregarPerfis();
+    carregarTipoUsuario(); // ADICIONADO
+  }
+
+  Future<void> carregarTipoUsuario() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      tipoUsuario = prefs.getString('tipoUsuario') ?? '';
+    });
   }
 
   Future<void> carregarPerfis() async {
@@ -63,14 +75,22 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
                 SizedBox(height: 40),
                 Center(child: Image.asset('assets/logo_oxycare.png', height: 40)),
                 SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.bluetooth_disabled, color: Colors.red, size: 16),
-                    SizedBox(width: 6),
-                    Text("Não conectado... Clique para conectar", style: TextStyle(color: Colors.red)),
-                  ],
-                ),
+GestureDetector(
+  onTap: () {
+    Navigator.pushNamed(context, '/conexao');
+  },
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Icon(Icons.bluetooth_disabled, color: Colors.red, size: 16),
+      SizedBox(width: 6),
+      Text(
+        "Não conectado... Clique para conectar",
+        style: TextStyle(color: Colors.red, decoration: TextDecoration.underline),
+      ),
+    ],
+  ),
+),
                 SizedBox(height: 12),
                 Text("Perfis Cadastrados", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 SizedBox(height: 8),
@@ -134,11 +154,14 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () => Navigator.pushNamed(context, '/adicionar_perfil'),
-                        child: Text("Novo Perfil"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           minimumSize: Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text(
+                          "Novo Perfil",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(height: 8),
@@ -146,26 +169,31 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
                         onPressed: () {
                           // Em breve: função de compartilhamento
                         },
-                        child: Text("Compartilhar Perfis"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           minimumSize: Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text(
+                          "Compartilhar Perfis",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: () {
-                          // Em breve: visualizar pacientes
+                          Navigator.pushNamed(context, '/visualizar_pacientes_cuidadores');
                         },
-                        child: Text("Visualizar Pacientes"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           minimumSize: Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
+                        child: Text(
+                          "Visualizar Pacientes",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -176,40 +204,67 @@ class _ListarPerfisPageState extends State<ListarPerfisPage> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         onTap: (index) async {
-          final perfil = await obterPerfilSalvo();
+          final prefs = await SharedPreferences.getInstance();
+          final idPerfil = prefs.getInt('idPerfilSelecionado');
+          final nomePerfil = prefs.getString('nomePerfil');
 
-          if (index == 0 && perfil != null) {
-            Navigator.pushNamed(
-              context,
-              '/tempoReal',
-              arguments: {
-                'idPerfilSelecionado': perfil['id'],
-                'nomePerfil': perfil['nome'],
-              },
-            );
-          }
-          if (index == 1) Navigator.pushNamed(context, '/listar_perfis');
-          if (index == 2) Navigator.pushNamed(context, '/conexao');
-          if (index == 3 && perfil != null) {
-            Navigator.pushNamed(
-              context,
-              '/historico',
-              arguments: {
-                'idPerfilSelecionado': perfil['id'],
-                'nomePerfil': perfil['nome'],
-              },
-            );
-          } else if (index == 3 && perfil == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Selecione um perfil primeiro")),
-            );
+          switch (index) {
+            case 0: // Tempo Real
+              if (idPerfil != null && nomePerfil != null) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/tempoReal',
+                  arguments: {
+                    'idPerfilSelecionado': idPerfil,
+                    'nomePerfil': nomePerfil,
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Selecione um perfil antes de acessar Tempo Real')),
+                );
+              }
+              break;
+            case 1: // Perfis
+              // já está aqui, não faz nada
+              break;
+            case 2: // Conexão
+              Navigator.pushReplacementNamed(context, '/conexao');
+              break;
+            case 3: // Histórico
+              if (idPerfil != null && nomePerfil != null) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/historico',
+                  arguments: {
+                    'idPerfilSelecionado': idPerfil,
+                    'nomePerfil': nomePerfil,
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Selecione um perfil antes de acessar Histórico')),
+                );
+              }
+              break;
+            case 4: // Dashboard (enfermeiro)
+              if (tipoUsuario == 'enfermeiro') {
+                Navigator.pushReplacementNamed(context, '/dashboard_enfermeiro');
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Acesso ao Dashboard restrito.')),
+                );
+              }
+              break;
           }
         },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tempo Real'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfis'),
-          BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Histórico'),
+          const BottomNavigationBarItem(icon: Icon(Icons.monitor_heart), label: 'Tempo Real'),
+          const BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Perfis'),
+          const BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Conexão'),
+          const BottomNavigationBarItem(icon: Icon(Icons.access_time), label: 'Histórico'),
+          if (tipoUsuario == 'enfermeiro')
+            const BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
       ),
     );

@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart'; // ✅ Adicio
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'registrar_medicao_page.dart';
 import 'login_page.dart';
 import 'recuperar_senha_page.dart';
 import 'tela_selecao_tipo.dart';
@@ -54,6 +54,7 @@ class CuidarApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
         '/cadastro': (context) => CadastroPage(),
         '/cadastro_usuario': (context) => const CadastroUsuarioPage(),
         '/sucesso': (context) => SucessoPage(),

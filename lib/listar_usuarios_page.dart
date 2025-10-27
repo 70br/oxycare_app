@@ -34,7 +34,7 @@ class _ListarUsuariosPageState extends State<ListarUsuariosPage> {
         return;
       }
 
-      final url = Uri.parse('http://silvaelias.ddns.net:5000/api/Usuarios');
+      final url = Uri.parse('http://107.21.234.209:8080/api/Usuarios');
       final resposta = await http.get(
         url,
         headers: {'Authorization': 'Bearer $token'},

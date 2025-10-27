@@ -88,19 +88,6 @@ class _CadastroPacientePageState extends State<CadastroPacientePage> {
       firstDate: primeiraData,
       lastDate: hoje,
       locale: const Locale('pt', 'BR'),
-      builder: (context, child) {
-        // 🔧 Ajuste visual — evita tela branca no modo escuro
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (selecionada != null) {
@@ -128,6 +115,7 @@ class _CadastroPacientePageState extends State<CadastroPacientePage> {
               key: _formKey,
               child: Column(
                 children: [
+                  // Logo e título igual ao cadastro de usuário
                   Image.asset('assets/logo_cuidar.png', height: 120),
                   const SizedBox(height: 12),
                   const Text(
@@ -145,6 +133,7 @@ class _CadastroPacientePageState extends State<CadastroPacientePage> {
                   ),
                   const SizedBox(height: 28),
 
+                  // Campo Nome
                   TextFormField(
                     controller: nomeController,
                     decoration: InputDecoration(
@@ -158,6 +147,7 @@ class _CadastroPacientePageState extends State<CadastroPacientePage> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Campo CPF
                   TextFormField(
                     controller: cpfController,
                     decoration: InputDecoration(
@@ -172,6 +162,7 @@ class _CadastroPacientePageState extends State<CadastroPacientePage> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Campo Data de Nascimento
                   TextFormField(
                     controller: dataController,
                     readOnly: true,

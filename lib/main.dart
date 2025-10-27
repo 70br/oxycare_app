@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // ✅ Adicionado
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,16 +15,16 @@ import 'cadastro_page.dart';
 import 'sucesso_page.dart';
 import 'conexao_page.dart';
 import 'cadastro_enfermeiro.dart';
-import 'cadastro_paciente.dart';
 import 'cadastro_cuidador.dart';
 import 'dashboard_enfermeiro.dart';
 import 'cadastrar_paciente_enfermeiro.dart';
 import 'gerar_codigo_cuidador.dart';
 import 'visualizar_pacientes_cuidadores.dart';
 import 'tela_codigo_acesso.dart';
-import 'cadastro_usuario_page.dart'; // nova tela
+import 'cadastro_usuario_page.dart';
 import 'listar_usuarios_page.dart';
 import 'home_page.dart';
+import 'cadastro_paciente_page.dart';
 
 void main() => runApp(const CuidarApp());
 
@@ -40,6 +41,16 @@ class CuidarApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
+      // ✅ Adicionando suporte a localização (corrige o bug da tela branca)
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
@@ -62,6 +73,7 @@ class CuidarApp extends StatelessWidget {
             VisualizarPacientesCuidadoresPage(),
         '/listar_usuarios': (context) => const ListarUsuariosPage(),
       },
+
       onGenerateRoute: (settings) {
         if (settings.name == '/tempoReal') {
           final args = settings.arguments as Map<String, dynamic>?;
@@ -116,7 +128,7 @@ class TelaInicial extends StatelessWidget {
       return;
     }
 
-    final url = Uri.parse('http://silvaelias.ddns.net:5000/api/Auth/logout');
+    final url = Uri.parse('http://107.21.234.209:8080/api/Auth/logout');
 
     try {
       await http.post(

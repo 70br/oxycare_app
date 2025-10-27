@@ -1,3 +1,4 @@
+
 name: oxycare_app
 description: "A new Flutter project."
 publish_to: 'none'
@@ -9,6 +10,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:          # ✅ Necessário para o seletor de datas funcionar
     sdk: flutter
   http: ^1.4.0
   cupertino_icons: ^1.0.6

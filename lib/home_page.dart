@@ -97,7 +97,8 @@ class _HomePageState extends State<HomePage> {
 
               // Botão 1
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/listar_usuarios'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/listar_usuarios'),
                 icon: const Icon(Icons.group),
                 label: const Text('Gerenciar Usuários'),
                 style: _estiloBotao(Colors.blue),
@@ -106,16 +107,28 @@ class _HomePageState extends State<HomePage> {
 
               // Botão 2
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/listar_pacientes'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/listar_pacientes'),
                 icon: const Icon(Icons.local_hospital),
                 label: const Text('Gerenciar Pacientes'),
                 style: _estiloBotao(Colors.teal),
               ),
               const SizedBox(height: 18),
 
+              // 🔹 Novo Botão - Cadastrar Paciente
+              ElevatedButton.icon(
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/cadastro_paciente'),
+                icon: const Icon(Icons.person_add_alt_1),
+                label: const Text('Cadastrar Paciente'),
+                style: _estiloBotao(Colors.green),
+              ),
+              const SizedBox(height: 18),
+
               // Botão 3
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/registrar_medicao'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/registrar_medicao'),
                 icon: const Icon(Icons.monitor_heart),
                 label: const Text('Registrar Medição'),
                 style: _estiloBotao(Colors.redAccent),
@@ -124,16 +137,18 @@ class _HomePageState extends State<HomePage> {
 
               // Botão 4
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/historico_medicoes'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/historico_medicoes'),
                 icon: const Icon(Icons.timeline),
-                label: const Text('Histórico de Medições'),
+                label: const Text('Histórico de Mediçõess'),
                 style: _estiloBotao(Colors.deepPurple),
               ),
               const SizedBox(height: 18),
 
               // Botão 5
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/gerar_relatorio_pdf'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/gerar_relatorio_pdf'),
                 icon: const Icon(Icons.picture_as_pdf),
                 label: const Text('Gerar Relatório PDF'),
                 style: _estiloBotao(Colors.orange),
@@ -160,7 +175,8 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
           BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Usuários'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_hospital), label: 'Pacientes'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.local_hospital), label: 'Pacientes'),
           BottomNavigationBarItem(icon: Icon(Icons.timeline), label: 'Histórico'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configurações'),
         ],
@@ -180,3 +196,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

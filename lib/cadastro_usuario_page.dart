@@ -31,7 +31,7 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
       mensagemSucesso = null;
     });
 
-    final url = Uri.parse('http://silvaelias.ddns.net:8080/api/Usuarios');
+    final url = Uri.parse('http://107.21.234.209:8080/api/Usuarios');
 
     final body = jsonEncode({
       'nome': nomeController.text.trim(),

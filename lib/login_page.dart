@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     // ✅ Mantido o endpoint que você disse que está funcionando
-    final url = Uri.parse('http://silvaelias.ddns.net:8080/api/Auth/login');
+    final url = Uri.parse('http://107.21.234.209:8080/api/Auth/login');
 
     try {
       final resposta = await http.post(

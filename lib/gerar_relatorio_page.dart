@@ -36,9 +36,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
       if (token == null) return;
 
       final url = Uri.parse('http://107.21.234.209:8080/api/Pacientes');
-      final resposta = await http.get(url, headers: {
-        'Authorization': 'Bearer $token',
-      });
+      final resposta = await http.get(url, headers: {'Authorization': 'Bearer $token'});
 
       if (resposta.statusCode == 200) {
         final lista = jsonDecode(resposta.body);
@@ -54,7 +52,6 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
   Future<void> selecionarData({required bool inicio}) async {
     final hoje = DateTime.now();
     final primeiraData = DateTime(2020);
-
     final selecionada = await showDatePicker(
       context: context,
       initialDate: hoje,
@@ -75,9 +72,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
   }
 
   Future<void> gerarRelatorio() async {
-    if (pacienteSelecionado == null ||
-        dataInicio == null ||
-        dataFim == null) {
+    if (pacienteSelecionado == null || dataInicio == null || dataFim == null) {
       setState(() => mensagem = "Preencha todos os campos corretamente.");
       return;
     }
@@ -89,32 +84,26 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
-
     final pacienteId = pacienteSelecionado['id'];
     final dataInicioStr = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataInicio!);
     final dataFimStr = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataFim!);
 
     final url = Uri.parse(
-        'http://107.21.234.209:8080/api/Relatorios/paciente/$pacienteId/gerar-pdf?dataInicio=$dataInicioStr&dataFim=$dataFimStr');
+      'http://107.21.234.209:8080/api/Relatorios/paciente/$pacienteId/gerar-pdf?dataInicio=$dataInicioStr&dataFim=$dataFimStr',
+    );
 
     try {
-      final resposta = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $token'},
-      );
+      final resposta = await http.get(url, headers: {'Authorization': 'Bearer $token'});
 
       if (resposta.statusCode == 200) {
         final tempDir = await getTemporaryDirectory();
-        final filePath =
-            '${tempDir.path}/Relatorio_${DateTime.now().millisecondsSinceEpoch}.pdf';
+        final filePath = '${tempDir.path}/Relatorio_${DateTime.now().millisecondsSinceEpoch}.pdf';
         final file = File(filePath);
         await file.writeAsBytes(resposta.bodyBytes);
-
         await OpenFile.open(filePath);
         setState(() => mensagem = "✅ Relatório gerado com sucesso!");
       } else {
-        setState(() => mensagem =
-            "Erro ao gerar relatório (Código ${resposta.statusCode}).");
+        setState(() => mensagem = "Erro ao gerar relatório (Código ${resposta.statusCode}).");
       }
     } catch (e) {
       setState(() => mensagem = "Erro de conexão com o servidor.");
@@ -156,9 +145,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
 
                 // Dropdown de pacientes
                 pacientes.isEmpty
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? const Center(child: CircularProgressIndicator())
                     : DropdownButtonFormField<dynamic>(
                         value: pacienteSelecionado,
                         items: pacientes.map((paciente) {
@@ -167,17 +154,15 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
                             child: Text(paciente['nome'] ?? 'Sem nome'),
                           );
                         }).toList(),
-                        onChanged: (value) =>
-                            setState(() => pacienteSelecionado = value),
+                        onChanged: (value) => setState(() => pacienteSelecionado = value),
                         decoration: InputDecoration(
                           labelText: "Selecione o Paciente",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        validator: (_) => pacienteSelecionado == null
-                            ? "Selecione um paciente"
-                            : null,
+                        validator: (_) =>
+                            pacienteSelecionado == null ? "Selecione um paciente" : null,
                       ),
                 const SizedBox(height: 16),
 
@@ -196,8 +181,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
                           ? "Selecionar data"
                           : DateFormat("dd/MM/yyyy").format(dataInicio!),
                       style: TextStyle(
-                        color:
-                            dataInicio == null ? Colors.grey : Colors.black87,
+                        color: dataInicio == null ? Colors.grey : Colors.black87,
                       ),
                     ),
                   ),
@@ -230,9 +214,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
                   Text(
                     mensagem!,
                     style: TextStyle(
-                      color: mensagem!.startsWith("✅")
-                          ? Colors.green
-                          : Colors.red,
+                      color: mensagem!.startsWith("✅") ? Colors.green : Colors.red,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -242,8 +224,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
                   onPressed: carregando ? null : gerarRelatorio,
                   icon: const Icon(Icons.picture_as_pdf),
                   label: carregando
-                      ? const CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2)
+                      ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                       : const Text("Gerar Relatório PDF"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -254,7 +235,6 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
                 const Divider(thickness: 1),
                 const Text(
                   "Conectado à API Cuidar+",

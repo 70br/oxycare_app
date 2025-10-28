@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // ✅ Adicionado
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'gerar_relatorio_page.dart';
@@ -44,7 +43,6 @@ class CuidarApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      // ✅ Adicionando suporte a localização (corrige o bug da tela branca)
       supportedLocales: const [
         Locale('pt', 'BR'),
       ],
@@ -62,9 +60,10 @@ class CuidarApp extends StatelessWidget {
         '/cadastro': (context) => CadastroPage(),
         '/cadastro_usuario': (context) => const CadastroUsuarioPage(),
         '/sucesso': (context) => SucessoPage(),
+
+        // ✅ Corrigido: agora também envia nomePaciente
         '/gerar_relatorio_pdf': (context) => const GerarRelatorioPage(),
         '/recuperar_senha': (context) => RecuperarSenhaPage(),
-        '/selecao_tipo': (context) => const TelaSelecaoTipo(),
         '/codigo_acesso': (context) => const TelaCodigoAcesso(),
         '/listar_perfis': (context) => ListarPerfisPage(),
         '/adicionar_perfil': (context) => AdicionarPerfilPage(),

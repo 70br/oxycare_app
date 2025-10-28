@@ -1,10 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // ✅ Adicionado
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'gerar_relatorio_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'registrar_medicao_page.dart';
 import 'login_page.dart';
+import 'listar_pacientes_page.dart';
 import 'recuperar_senha_page.dart';
 import 'tela_selecao_tipo.dart';
 import 'tempo_real_page.dart';
@@ -54,10 +57,12 @@ class CuidarApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/listar_pacientes': (context) => const ListarPacientesPage(),
         '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
         '/cadastro': (context) => CadastroPage(),
         '/cadastro_usuario': (context) => const CadastroUsuarioPage(),
         '/sucesso': (context) => SucessoPage(),
+        '/gerar_relatorio_pdf': (context) => const GerarRelatorioPage(),
         '/recuperar_senha': (context) => RecuperarSenhaPage(),
         '/selecao_tipo': (context) => const TelaSelecaoTipo(),
         '/codigo_acesso': (context) => const TelaCodigoAcesso(),

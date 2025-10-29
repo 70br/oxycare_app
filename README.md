@@ -1,241 +1,98 @@
+# 🩺 Cuidar+
 
-# 🩺 Oxycare - Mobile (Projeto Acadêmico UFS)
+O **Cuidar+** é um sistema integrado de **monitoramento e triagem inteligente de sinais vitais**, desenvolvido no **Departamento de Computação da Universidade Federal de Sergipe (UFS)**.
 
-Sistema completo de monitoramento de sinais vitais com comunicação via **Bluetooth BLE**, **backend em PHP + MySQL** e frontend desenvolvido em **Flutter**. Este projeto tem como objetivo permitir a visualização em **tempo real** de batimentos cardíacos, temperatura e oxigenação do paciente.
-
----
-## 🧑‍🔬 Créditos do Projeto
-
-### Inventores Fundadores
-- Edward Moreno – [edmoreno@academic
-
-### Mentores Técnicos
-- Débora Maria Coelho Nascimento  
-- Michel dos Santos Soares
-
-### Time de Desenvolvimento
-- Felipe Ferreira da Silva  
-- Bruno Santana Andrade  
-- Isaías Elias da Silva  
-- Marcelo Santos da Cruz  
-- Matheus Lima da Cruz  
-- Mateus do Rosário Costa
-
-### Especialistas
-- Talita Leite dos Santos Moraes  
-- Grace Anne Azevedo Dória
-
----
-## 🧪 RESUMO DESCRITIVO (TUTORIAL COMPLETO)
-
-### 🔧 Etapa 1 – Ambiente de Desenvolvimento
-
-- Sistema Operacional: **Linux Ubuntu 22.04**  
-- Editor: **Visual Studio Code**  
-- SDK: **Flutter 3.x**  
-- Terminal: Bash  
-- Backend: **Servidor Apache com PHP 8.1**  
-- Banco de dados: **MySQL 5.7**  
-- Hospedagem para testes: **DDNS + Porta liberada no roteador**  
-- Bluetooth: **Flutter Blue Plus** com comunicação serial BLE
+O projeto combina **hardware (ESP32)** e **software (Flutter + .NET + AWS)** para otimizar o processo de **triagem e acompanhamento de pacientes** em ambientes de saúde e domiciliares.
 
 ---
 
-### 📦 Etapa 2 – Instalação do Projeto no Linux
+## 🎯 Objetivo
 
-```bash
-# Atualize seu sistema
-sudo apt update && sudo apt upgrade -y
-
-# Instale o Flutter (já adicionado ao PATH)
-git clone https://github.com/flutter/flutter.git
-export PATH="$PATH:`pwd`/flutter/bin"
-flutter doctor
-
-
-# Instale as dependências do projeto
-flutter pub get
-
-# Conecte seu celular via USB (ativar modo desenvolvedor)
-flutter devices
-
-# Rode o app
-flutter run
-```
+Fornecer uma **avaliação rápida e precisa da condição clínica** de um paciente, utilizando sensores de temperatura, frequência cardíaca e oxigenação do sangue (SpO₂).
+Com base nesses dados, o sistema aplica protocolos de triagem, como o **Protocolo de Manchester**, ajudando profissionais de saúde a **priorizar atendimentos** e **detectar anomalias precocemente**.
 
 ---
 
-### 🌐 Etapa 3 – Estrutura do Projeto
+## 🧩 Componentes do Sistema
 
-```text
-oxycare_app/
-├── lib/
-│   ├── main.dart                    # Roteamento principal
-│   ├── login_page.dart              # Tela de login
-│   ├── tempo_real_page.dart         # Tela com dados ao vivo do protótipo via Bluetooth
-│   ├── listar_perfis_page.dart      # Lista e seleção de perfis
-│   ├── historico_page.dart          # Tela com gráficos históricos
-│   ├── conexao_page.dart            # Status e pareamento Bluetooth
-├── assets/                          # Imagens da aplicação
-├── pubspec.yaml                     # Dependências do projeto
-```
+### 🔹 Hardware (ESP32)
 
----
+* Coleta de temperatura, frequência cardíaca e SpO₂
+* Comunicação via **Bluetooth Low Energy (BLE)**
+* Exibição de dados e alertas no display
+* Alertas sonoros e visuais em casos críticos
 
-### 🧠 Etapa 4 – Tecnologias Utilizadas
+### 🔹 Aplicativo Móvel (Flutter)
 
-| Tecnologia | Finalidade |
-|-----------|------------|
-| **Flutter** | Criação do app mobile |
-| **Dart** | Lógica e componentes |
-| **Flutter Blue Plus** | Comunicação com o dispositivo BLE |
-| **Shared Preferences** | Armazenamento local de perfil selecionado |
-| **PHP 8.1** | Backend simples com autenticação e persistência |
-| **MySQL** | Banco de dados para usuários, perfis e histórico |
-| **Postman / Curl** | Testes dos endpoints da API |
-| **DDNS (noip.com)** | Tornar o servidor visível fora da rede local |
+* Interface intuitiva para **cadastro e monitoramento de pacientes**
+* Comunicação direta com o dispositivo via BLE
+* Funcionalidade **offline**, com sincronização posterior
+* **Notificações push** via Firebase
+* Geração de relatórios e gráficos históricos
+
+### 🔹 Servidor Central (.NET + AWS)
+
+* API REST documentada com Swagger
+* Banco de dados **PostgreSQL (RDS)**
+* Autenticação com **JWT Tokens**
+* Deploy automatizado com **GitHub Actions**
+* Infraestrutura como código usando **Terraform**
 
 ---
 
-### 🔐 Etapa 5 – Autenticação via Login
+## ⚙️ Funcionalidades Principais
 
-- Os usuários fazem login com email e senha.
-- O backend verifica se o usuário existe na tabela `usuarios`.
-- Se estiver correto, redireciona para a tela `TempoRealPage`.
-
-#### login.php (resumo):
-
-```php
-$email = $data["email"];
-$senha = $data["senha"];
-
-SELECT * FROM usuarios WHERE email = ?
-
-if (password_verify($senha, $user['senha'])) {
-  // retorna JSON com nome, tipo e ID do usuário
-}
-```
+* 🧠 Triagem automatizada e classificação de risco
+* 📊 Relatórios e histórico de medições
+* 🔔 Notificações push em tempo real
+* ☁️ Sincronização em nuvem com backup automático
+* 🔒 Conformidade total com a **LGPD**
 
 ---
 
-### 🧬 Etapa 6 – Comunicação com o Hardware (Protótipo BLE)
+## 👥 Público-Alvo
 
-Na tela `TempoRealPage`:
-
-1. O app inicia o escaneamento BLE.
-2. Conecta automaticamente a dispositivos com nome **"PROTOTIPO"** ou **"OXYSENSOR"**.
-3. Recebe dados como:
-
-```
-85;36.4;97
-```
-
-4. O app extrai os valores (bpm, temperatura, spo2), exibe na tela e envia via HTTP para o PHP:
-
-```json
-{
-  "paciente_id": 5,
-  "batimentos": 85,
-  "temperatura": 36.4,
-  "spo2": 97
-}
-```
+* **Profissionais de saúde**: enfermeiros, técnicos e médicos
+* **Pacientes e cuidadores**: para acompanhamento remoto de sinais vitais
 
 ---
 
-### 📊 Etapa 7 – Visualização do Histórico
+## 🏗️ Tecnologias Utilizadas
 
-- Tela `HistoricoPage`
-- Ao selecionar um perfil, consulta o histórico no servidor com base no `idPerfilSelecionado`.
-- Exibe os dados em gráfico (ex: batimentos ao longo do tempo).
-
----
-
-### 📡 Backend PHP (Resumo)
-
-| Endpoint | Função |
-|----------|--------|
-| `login.php` | Autenticação do usuário |
-| `receber_dados.php` | Recebe dados do BLE |
-| `listar_perfis.php` | Lista perfis cadastrados |
-| `historico.php` | Retorna histórico de sinais |
-
-**Estrutura do banco:**
-- `usuarios(id, nome, email, senha, tipo)`
-- `perfis(id, nome, usuario_id)`
-- `historico(id, paciente_id, batimentos, temperatura, spo2, data_hora)`
+| Camada           | Tecnologia                       |
+| ---------------- | -------------------------------- |
+| Aplicativo Móvel | Flutter / Dart                   |
+| Backend          | .NET 8.0                         |
+| Banco de Dados   | PostgreSQL (AWS RDS)             |
+| Infraestrutura   | AWS ECS, ECR, S3, SES, Terraform |
+| CI/CD            | GitHub Actions                   |
+| Notificações     | Firebase Cloud Messaging         |
 
 ---
 
-## 📥 Como Gerar o APK
+## 🔐 Segurança
 
-```bash
-flutter clean
-flutter pub get
-flutter build apk --release
-```
-
-O APK será gerado em:
-```
-build/app/outputs/flutter-apk/app-release.apk
-```
+* Criptografia de dados em trânsito e em repouso
+* Autenticação via JWT com expiração
+* Controle de acesso baseado em papéis (RBAC)
+* Conformidade com a **Lei Geral de Proteção de Dados (LGPD)**
 
 ---
 
-## ✅ Funcionalidades Prontas
+## 👨‍💻 Equipe de Desenvolvimento
 
-- [x] Login com email e senha  
-- [x] Recepção de dados via Bluetooth BLE  
-- [x] Envio automático para o servidor  
-- [x] Seleção de perfis  
-- [x] Armazenamento local do perfil  
-- [x] Gráfico histórico por perfil  
+**Universidade Federal de Sergipe – DCOMP/UFS**
+
+* Bruno Santana Andrade
+* Felipe Ferreira da Silva
+* Isaias Elias da Silva
+* Marcelo Santos da Cruz
+* Mateus do Rosário Costa
+* Matheus Lima da Cruz
 
 ---
 
-## 💬 Considerações Finais
+## 📄 Licença
 
-Este projeto acadêmico foi desenvolvido com foco em usabilidade, conectividade e escalabilidade, buscando simular um ambiente real de monitoramento médico. Todo o código está disponível neste repositório com instruções completas para quem quiser adaptar, evoluir ou contribuir.
-
-> Desenvolvido com dedicação por alunos da Universidade Federal de Sergipe 💙
-
-OBS: Este backend foi desenvolvido em PHP apenas para fins de teste e validação inicial. No entanto, poderá ser substituído futuramente por outra API construída com tecnologias diferentes, conforme a evolução do projeto e suas necessidades.
----
-
-### 🚀 Fluxo Atual Implementado – 05/08/Agosto 2025
-
-> Este fluxo segue ** o PDF do Fluxo de Autenticação enviado pelo grupo**.
-
-**✅ Login:**
-- Login funcional para:
-  - Paciente
-  - Cuidador
-  - Enfermeiro
-- Redirecionamento:
-  - Paciente/Cuidador → monitoramento em tempo real.
-  - Enfermeiro → painel de gerenciamento (dashboard_enfermeiro).
-
-**✅ Cadastro seguindo o fluxo do PDF:**
-- Seleção de tipo de usuário (Paciente/Cuidador ou Enfermeiro)
-- Paciente/Cuidador:
-  - Inserem o código gerado pelo enfermeiro.
-  - Fazem cadastro com vínculo.
-- Enfermeiro:
-  - Informa nome, email, senha e CRM/COREN.
-  - Acesso ao painel de controle.
-
-**✅ Painel do Enfermeiro:**
-- Botões:
-  - Cadastrar paciente + gerar código
-  - Gerar código para cuidador
-  - Visualizar pacientes e cuidadores
-- Barra inferior com acesso a:
-  - Tempo Real
-  - Perfis
-  - Conexão
-  - Histórico
-
-**🔜 Próximas etapas:**
-- Enfermeiro visualizar dados em tempo real de qualquer paciente listado.
-- Ajustes visuais finais para apresentação do MVP.
-
+Projeto acadêmico desenvolvido para fins educacionais na **UFS**.
+Uso permitido para pesquisa, extensão e aprendizado.

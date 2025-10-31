@@ -2,31 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'gerar_relatorio_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'registrar_medicao_page.dart';
+
+// Apenas as telas existentes:
 import 'login_page.dart';
-import 'listar_pacientes_page.dart';
-import 'recuperar_senha_page.dart';
-import 'tela_selecao_tipo.dart';
-import 'tempo_real_page.dart';
-import 'historico_page.dart';
-import 'listar_perfis_page.dart';
-import 'adicionar_perfil_page.dart';
-import 'cadastro_page.dart';
-import 'sucesso_page.dart';
-import 'conexao_page.dart';
-import 'cadastro_enfermeiro.dart';
-import 'cadastro_cuidador.dart';
-import 'dashboard_enfermeiro.dart';
-import 'cadastrar_paciente_enfermeiro.dart';
-import 'gerar_codigo_cuidador.dart';
-import 'visualizar_pacientes_cuidadores.dart';
-import 'tela_codigo_acesso.dart';
-import 'cadastro_usuario_page.dart';
-import 'listar_usuarios_page.dart';
 import 'home_page.dart';
+import 'cadastro_usuario_page.dart';
 import 'cadastro_paciente_page.dart';
+import 'listar_pacientes_page.dart';
+import 'listar_usuarios_page.dart';
+import 'registrar_medicao_page.dart';
+import 'gerar_relatorio_page.dart';
 
 void main() => runApp(const CuidarApp());
 
@@ -52,68 +38,16 @@ class CuidarApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
+      // Apenas rotas válidas
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
-        '/listar_pacientes': (context) => const ListarPacientesPage(),
-        '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
-        '/cadastro': (context) => CadastroPage(),
         '/cadastro_usuario': (context) => const CadastroUsuarioPage(),
-        '/sucesso': (context) => SucessoPage(),
-
-        // ✅ Corrigido: agora também envia nomePaciente
-        '/gerar_relatorio_pdf': (context) => const GerarRelatorioPage(),
-        '/recuperar_senha': (context) => RecuperarSenhaPage(),
-        '/codigo_acesso': (context) => const TelaCodigoAcesso(),
-        '/listar_perfis': (context) => ListarPerfisPage(),
-        '/adicionar_perfil': (context) => AdicionarPerfilPage(),
-        '/conexao': (context) => ConexaoPage(),
         '/cadastro_paciente': (context) => const CadastroPacientePage(),
-        '/cadastro_enfermeiro': (context) => const CadastroEnfermeiro(),
-        '/dashboard_enfermeiro': (context) => const DashboardEnfermeiro(),
-        '/cadastrar_paciente_enfermeiro': (context) =>
-            CadastrarPacienteEnfermeiroPage(),
-        '/gerar_codigo_cuidador': (context) => GerarCodigoCuidadorPage(),
-        '/visualizar_pacientes_cuidadores': (context) =>
-            VisualizarPacientesCuidadoresPage(),
+        '/listar_pacientes': (context) => const ListarPacientesPage(),
         '/listar_usuarios': (context) => const ListarUsuariosPage(),
-      },
-
-      onGenerateRoute: (settings) {
-        if (settings.name == '/tempoReal') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          if (args != null &&
-              args.containsKey('idPerfilSelecionado') &&
-              args.containsKey('nomePerfil')) {
-            return MaterialPageRoute(
-              builder: (context) => TempoRealPage(
-                idPerfilSelecionado: args['idPerfilSelecionado'],
-                nomePerfil: args['nomePerfil'],
-              ),
-            );
-          } else {
-            return MaterialPageRoute(builder: (context) => ListarPerfisPage());
-          }
-        }
-
-        if (settings.name == '/historico') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) => HistoricoPage(
-              idPerfilSelecionado: args['idPerfilSelecionado'],
-              nomePerfil: args['nomePerfil'],
-            ),
-          );
-        }
-
-        if (settings.name == '/cadastro_cuidador') {
-          final pacienteId = settings.arguments as int;
-          return MaterialPageRoute(
-            builder: (context) => CadastroCuidadorPage(pacienteId: pacienteId),
-          );
-        }
-
-        return null;
+        '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
+        '/gerar_relatorio': (context) => const GerarRelatorioPage(),
       },
     );
   }
@@ -163,25 +97,20 @@ class TelaInicial extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/tempoReal'),
-            child: const Text('Monitoramento em Tempo Real'),
+            onPressed: () => Navigator.pushNamed(context, '/listar_pacientes'),
+            child: const Text('Listar Pacientes'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/listar_perfis'),
-            child: const Text('Listar Perfis'),
+            onPressed: () => Navigator.pushNamed(context, '/listar_usuarios'),
+            child: const Text('Listar Usuários'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/historico'),
-            child: const Text('Histórico de Sinais'),
+            onPressed: () => Navigator.pushNamed(context, '/registrar_medicao'),
+            child: const Text('Registrar Medição'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/adicionar_perfil'),
-            child: const Text('Adicionar Perfil'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(
-                context, '/visualizar_pacientes_cuidadores'),
-            child: const Text('Pacientes e Cuidadores'),
+            onPressed: () => Navigator.pushNamed(context, '/gerar_relatorio'),
+            child: const Text('Gerar Relatório'),
           ),
           const SizedBox(height: 20),
           const Divider(),

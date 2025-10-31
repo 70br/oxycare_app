@@ -29,7 +29,6 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
-
     final url = Uri.parse('http://107.21.234.209:8080/api/Pacientes');
 
     try {
@@ -71,6 +70,57 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
         arguments: {'pacienteId': paciente['id'], 'nome': paciente['nome']});
   }
 
+  Future<void> _excluirPaciente(dynamic paciente) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Excluir Paciente"),
+        content:
+            Text("Deseja realmente excluir o paciente ${paciente['nome']}?"),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancelar")),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Excluir", style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+      final url = Uri.parse(
+          'http://107.21.234.209:8080/api/Pacientes/${paciente['id']}');
+
+      final resposta = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (resposta.statusCode == 204) {
+        setState(() {
+          pacientes.removeWhere((p) => p['id'] == paciente['id']);
+          mensagem = "✅ Paciente excluído com sucesso!";
+        });
+      } else {
+        setState(() {
+          mensagem = "Erro ao excluir paciente (${resposta.statusCode}).";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        mensagem = "Erro de conexão com o servidor.";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,8 +143,8 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
                   itemBuilder: (context, index) {
                     final p = pacientes[index];
                     return Card(
-                      margin:
-                          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -106,6 +156,7 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
                           onSelected: (value) {
                             if (value == 'relatorio') _abrirRelatorio(p);
                             if (value == 'medicao') _abrirMedicao(p);
+                            if (value == 'excluir') _excluirPaciente(p);
                           },
                           itemBuilder: (context) => [
                             const PopupMenuItem(
@@ -115,6 +166,14 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
                             const PopupMenuItem(
                               value: 'relatorio',
                               child: Text('Gerar Relatório PDF'),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'excluir',
+                              child: Text(
+                                'Excluir Paciente',
+                                style: TextStyle(color: Colors.red),
+                              ),
                             ),
                           ],
                         ),

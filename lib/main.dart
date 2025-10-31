@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Apenas as telas existentes:
+// Suas telas já existentes:
 import 'login_page.dart';
 import 'home_page.dart';
 import 'cadastro_usuario_page.dart';
@@ -13,6 +13,9 @@ import 'listar_pacientes_page.dart';
 import 'listar_usuarios_page.dart';
 import 'registrar_medicao_page.dart';
 import 'gerar_relatorio_page.dart';
+
+// Nova tela de histórico
+import 'historico_page.dart';
 
 void main() => runApp(const CuidarApp());
 
@@ -38,7 +41,6 @@ class CuidarApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      // Apenas rotas válidas
       routes: {
         '/': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
@@ -47,7 +49,20 @@ class CuidarApp extends StatelessWidget {
         '/listar_pacientes': (context) => const ListarPacientesPage(),
         '/listar_usuarios': (context) => const ListarUsuariosPage(),
         '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
+
+        // Sem argumentos aqui, porque agora usaremos onGenerateRoute para pegar os parâmetros
         '/gerar_relatorio': (context) => const GerarRelatorioPage(),
+      },
+
+      /// Rotas que precisam receber argumentos via pushNamed()
+      onGenerateRoute: (settings) {
+        if (settings.name == '/historico' || settings.name == '/historico_medicoes') {
+          // ❌ Removido args que causava erro
+          return MaterialPageRoute(
+            builder: (_) => const HistoricoPage(), // ✅ chamada sem parâmetros
+          );
+        }
+        return null;
       },
     );
   }

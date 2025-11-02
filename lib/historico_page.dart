@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class HistoricoPage extends StatefulWidget {
   const HistoricoPage({super.key});
@@ -13,7 +14,7 @@ class HistoricoPage extends StatefulWidget {
 class _HistoricoPageState extends State<HistoricoPage> {
   String? pacienteSelecionadoId;
   List<Map<String, String>> pacientes = [];
-  Map<String, dynamic>? historico;
+  List<dynamic> medicoes = [];
   bool carregandoPacientes = true;
   bool carregando = false;
   String? mensagem;
@@ -24,7 +25,6 @@ class _HistoricoPageState extends State<HistoricoPage> {
     carregarPacientes();
   }
 
-  /// 🔹 Carrega lista de pacientes
   Future<void> carregarPacientes() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -59,7 +59,6 @@ class _HistoricoPageState extends State<HistoricoPage> {
     }
   }
 
-  /// 🔹 Busca histórico do paciente selecionado
   Future<void> carregarHistorico() async {
     if (pacienteSelecionadoId == null) {
       setState(() => mensagem = "Selecione um paciente primeiro.");
@@ -69,7 +68,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
     setState(() {
       carregando = true;
       mensagem = null;
-      historico = null;
+      medicoes = [];
     });
 
     try {
@@ -87,8 +86,10 @@ class _HistoricoPageState extends State<HistoricoPage> {
       );
 
       if (resposta.statusCode == 200) {
+        final data = jsonDecode(resposta.body);
         setState(() {
-          historico = jsonDecode(resposta.body);
+          medicoes = data['medicoes'] ?? [];
+          if (medicoes.isEmpty) mensagem = "Nenhuma medição encontrada.";
         });
       } else if (resposta.statusCode == 404) {
         setState(() => mensagem = "Nenhum histórico encontrado.");
@@ -103,23 +104,20 @@ class _HistoricoPageState extends State<HistoricoPage> {
     }
   }
 
-  /// 🔹 Deletar histórico do paciente
-  Future<void> deletarHistorico() async {
-    if (pacienteSelecionadoId == null) return;
-
+  Future<void> deletarMedicao(String idMedicao) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Excluir Histórico"),
-        content: const Text("Deseja realmente excluir este histórico?"),
+        title: const Text("Excluir Medição"),
+        content: const Text("Deseja realmente excluir esta medição?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text("Cancelar")),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text("Excluir",
-                  style: TextStyle(color: Colors.red))),
+              child:
+                  const Text("Excluir", style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -129,8 +127,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      final url = Uri.parse(
-          'http://107.21.234.209:8080/api/Historicos/paciente/$pacienteSelecionadoId');
+      final url = Uri.parse('http://107.21.234.209:8080/api/Medicoes/$idMedicao');
 
       final resposta = await http.delete(
         url,
@@ -142,59 +139,24 @@ class _HistoricoPageState extends State<HistoricoPage> {
 
       if (resposta.statusCode == 204) {
         setState(() {
-          historico = null;
-          mensagem = "✅ Histórico excluído com sucesso!";
+          medicoes.removeWhere((m) => m['id'] == idMedicao);
+          mensagem = "✅ Medição excluída com sucesso!";
         });
       } else {
         setState(() =>
-            mensagem = "Erro ao excluir (${resposta.statusCode}).");
+            mensagem = "Erro ao excluir medição (${resposta.statusCode}).");
       }
     } catch (e) {
       setState(() => mensagem = "Erro ao conectar ao servidor.");
     }
   }
 
-  /// 🔹 Criar histórico (teste manual)
-  Future<void> criarHistoricoTeste() async {
-    if (pacienteSelecionadoId == null) {
-      setState(() => mensagem = "Selecione um paciente primeiro.");
-      return;
-    }
-
+  String formatarData(String dataIso) {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('accessToken');
-      final url = Uri.parse('http://107.21.234.209:8080/api/Historicos');
-
-      final body = jsonEncode({
-        "pacienteId": pacienteSelecionadoId,
-        "dataInicio": DateTime.now().toIso8601String(),
-        "dataFim": DateTime.now().toIso8601String(),
-      });
-
-      final resposta = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      );
-
-      if (resposta.statusCode == 201) {
-        setState(() {
-          mensagem = "✅ Histórico criado com sucesso!";
-        });
-      } else {
-        setState(() {
-          mensagem =
-              "Erro ao criar histórico (${resposta.statusCode}): ${resposta.body}";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        mensagem = "Erro de conexão com o servidor.";
-      });
+      final data = DateTime.parse(dataIso);
+      return DateFormat('dd/MM/yyyy HH:mm').format(data);
+    } catch (_) {
+      return dataIso;
     }
   }
 
@@ -202,9 +164,9 @@ class _HistoricoPageState extends State<HistoricoPage> {
     return ElevatedButton.styleFrom(
       backgroundColor: cor,
       foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      padding: const EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      textStyle: const TextStyle(fontWeight: FontWeight.bold),
     );
   }
 
@@ -222,8 +184,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/logo_cuidar.png', height: 120),
-              const SizedBox(height: 12),
+              Image.asset('assets/logo_cuidar.png', height: 100),
+              const SizedBox(height: 8),
               const Text(
                 'Cuidar+',
                 textAlign: TextAlign.center,
@@ -238,7 +200,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               carregandoPacientes
                   ? const Center(
@@ -259,10 +221,8 @@ class _HistoricoPageState extends State<HistoricoPage> {
                           .toList(),
                       onChanged: (value) =>
                           setState(() => pacienteSelecionadoId = value),
-                      validator: (v) =>
-                          v == null ? "Selecione um paciente" : null,
                     ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               ElevatedButton.icon(
                 onPressed: carregando ? null : carregarHistorico,
@@ -273,8 +233,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
                     : const Text("Buscar Histórico"),
                 style: estiloBotao(Colors.blueAccent),
               ),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               if (mensagem != null)
                 Text(
@@ -288,41 +247,41 @@ class _HistoricoPageState extends State<HistoricoPage> {
                   ),
                 ),
 
-              if (historico != null) ...[
-                const SizedBox(height: 16),
-                Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("🩺 ID: ${historico!['id']}"),
-                        Text("📅 Início: ${historico!['dataInicio']}"),
-                        Text("📅 Fim: ${historico!['dataFim']}"),
-                        Text("🕒 Criado em: ${historico!['criadoEm']}"),
-                      ],
+              if (medicoes.isNotEmpty)
+                ...medicoes.map((m) {
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "📅 ${formatarData(m['dataHora'] ?? '')}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                          const SizedBox(height: 6),
+                          Text("🌡️ Temperatura: ${m['temperatura']} °C"),
+                          Text("❤️ Frequência: ${m['frequenciaCardiaca']} bpm"),
+                          Text("🫁 Saturação: ${m['saturacao']}%"),
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: "Excluir Medição",
+                              onPressed: () => deletarMedicao(m['id']),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: deletarHistorico,
-                  icon: const Icon(Icons.delete),
-                  label: const Text("Excluir Histórico"),
-                  style: estiloBotao(Colors.redAccent),
-                ),
-              ],
-
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: criarHistoricoTeste,
-                icon: const Icon(Icons.add),
-                label: const Text("Criar Histórico (teste)"),
-                style: estiloBotao(Colors.green),
-              ),
+                  );
+                }).toList(),
 
               const SizedBox(height: 30),
               const Divider(thickness: 1),

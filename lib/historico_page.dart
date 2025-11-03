@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class HistoricoPage extends StatefulWidget {
   const HistoricoPage({super.key});
@@ -172,6 +173,16 @@ class _HistoricoPageState extends State<HistoricoPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<_MedicaoData> dadosGrafico = medicoes.map((m) {
+      final data = DateTime.tryParse(m['dataHora'] ?? '') ?? DateTime.now();
+      return _MedicaoData(
+        data,
+        (m['temperatura'] ?? 0).toDouble(),
+        (m['frequenciaCardiaca'] ?? 0).toDouble(),
+        (m['saturacao'] ?? 0).toDouble(),
+      );
+    }).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -196,7 +207,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Consultar Histórico de Mediçõess',
+                'Consultar Histórico de Medições',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
@@ -240,12 +251,49 @@ class _HistoricoPageState extends State<HistoricoPage> {
                   mensagem!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: mensagem!.startsWith("✅")
-                        ? Colors.green
-                        : Colors.red,
+                    color: mensagem!.startsWith("✅") ? Colors.green : Colors.red,
                     fontSize: 16,
                   ),
                 ),
+
+              if (dadosGrafico.isNotEmpty)
+                SizedBox(
+                  height: 250,
+                  child: SfCartesianChart(
+                    primaryXAxis: DateTimeAxis(),
+                    legend: Legend(isVisible: true),
+                    tooltipBehavior: TooltipBehavior(enable: true),
+                    // 🔧 AJUSTE FEITO AQUI
+                    series: <CartesianSeries<_MedicaoData, DateTime>>[
+                      LineSeries<_MedicaoData, DateTime>(
+                        dataSource: dadosGrafico,
+                        xValueMapper: (m, _) => m.data,
+                        yValueMapper: (m, _) => m.temperatura,
+                        name: 'Temperatura (°C)',
+                        color: Colors.red,
+                        markerSettings: const MarkerSettings(isVisible: true),
+                      ),
+                      LineSeries<_MedicaoData, DateTime>(
+                        dataSource: dadosGrafico,
+                        xValueMapper: (m, _) => m.data,
+                        yValueMapper: (m, _) => m.frequencia,
+                        name: 'Frequência (bpm)',
+                        color: Colors.blue,
+                        markerSettings: const MarkerSettings(isVisible: true),
+                      ),
+                      LineSeries<_MedicaoData, DateTime>(
+                        dataSource: dadosGrafico,
+                        xValueMapper: (m, _) => m.data,
+                        yValueMapper: (m, _) => m.saturacao,
+                        name: 'Saturação (%)',
+                        color: Colors.green,
+                        markerSettings: const MarkerSettings(isVisible: true),
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 20),
 
               if (medicoes.isNotEmpty)
                 ...medicoes.map((m) {
@@ -296,4 +344,13 @@ class _HistoricoPageState extends State<HistoricoPage> {
       ),
     );
   }
+}
+
+class _MedicaoData {
+  final DateTime data;
+  final double temperatura;
+  final double frequencia;
+  final double saturacao;
+
+  _MedicaoData(this.data, this.temperatura, this.frequencia, this.saturacao);
 }

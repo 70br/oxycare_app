@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'gerar_relatorio_page.dart'; // ✅ import para abrir a tela diretamente
 
 class ListarPacientesPage extends StatefulWidget {
   const ListarPacientesPage({super.key});
@@ -60,9 +61,14 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
         .then((_) => carregarPacientes());
   }
 
+  // ✅ AJUSTADO: abre a tela de relatório passando o ID do paciente
   void _abrirRelatorio(dynamic paciente) {
-    Navigator.pushNamed(context, '/gerar_relatorio_pdf',
-        arguments: {'pacienteId': paciente['id'], 'nome': paciente['nome']});
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GerarRelatorioPage(pacienteId: paciente['id']),
+      ),
+    );
   }
 
   void _abrirMedicao(dynamic paciente) {
@@ -143,8 +149,8 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
                   itemBuilder: (context, index) {
                     final p = pacientes[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                      margin:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/registrar_medicao'),
                 icon: const Icon(Icons.monitor_heart),
-                label: const Text('Registrar Medição'),
+                label: const Text('Acompanhar Medição'),
                 style: _estiloBotao(Colors.redAccent),
               ),
               const SizedBox(height: 18),

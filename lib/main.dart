@@ -131,7 +131,7 @@ class TelaInicial extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/registrar_medicao'),
-            child: const Text('Registrar Medição'),
+            child: const Text('Acompanhar Medição'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/gerar_relatorio'),

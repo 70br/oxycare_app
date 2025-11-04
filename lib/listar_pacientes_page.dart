@@ -162,7 +162,7 @@ class _ListarPacientesPageState extends State<ListarPacientesPage> {
                           itemBuilder: (context) => [
                             const PopupMenuItem(
                               value: 'medicao',
-                              child: Text('Registrar Medição'),
+                              child: Text('Acompanhar Medição'),
                             ),
                             const PopupMenuItem(
                               value: 'relatorio',

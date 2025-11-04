@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
               const Divider(thickness: 1),
               const SizedBox(height: 8),
               const Text(
-                'Cuidar+ API v1 - Conectado a silvaelias.ddns.net',
+                'Cuidar+ API v1',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: Colors.black45),
               ),

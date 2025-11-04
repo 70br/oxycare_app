@@ -19,7 +19,7 @@ class BleState extends ChangeNotifier {
   int freqCardiaca = 0;
   double temperatura = 0;
   DateTime? lastUpdateTimestamp = null;
-  Future<void> Function(double freqRespiratoria, double temperatura, int freqCardiaca)? callback = null;
+  Future<void> Function(double freqRespiratoria, double temperatura, int freqCardiaca)? _callback = null;
 
   final Guid uuidServico = Guid(HardwareCharacteristics.service);
   final Guid uuidFreqCardiaca = Guid(HardwareCharacteristics.heartRate);
@@ -27,7 +27,7 @@ class BleState extends ChangeNotifier {
   final Guid uuidTemperatura = Guid(HardwareCharacteristics.temperature);
 
   void setCallBack(Future<void> Function(double freqRespiratoria, double temperatura, int freqCardiaca)? callback) {
-    callback = callback;
+    _callback = callback;
   }
 
 
@@ -41,7 +41,7 @@ class BleState extends ChangeNotifier {
       await device?.disconnect();
       connected = false;
       device = null;
-      callback = null;
+      _callback = null;
       notifyListeners();
     }
   }
@@ -87,7 +87,7 @@ class BleState extends ChangeNotifier {
               _subscriptionRespiratoria = c.onValueReceived.listen((value) {
                 temperatura = double.parse(_decode(value));
                 lastUpdateTimestamp = DateTime.now();
-                if(callback != null) callback!(freqRespiratoria, temperatura, freqCardiaca);
+                if(_callback != null) _callback!(freqRespiratoria, temperatura, freqCardiaca);
                 notifyListeners();
               });
           }

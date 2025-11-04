@@ -87,9 +87,12 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
   Widget build(BuildContext context) {
     final bleState = Provider.of<BleState>(context);
     String textString = bleState.connected ? "Já Conectado!" : "Conectar a um Aparelho";
+  void conectarDispositivo() {
+    Navigator.pushReplacementNamed(context, '/conectar_aparelho');
+  }
 
   Future<void> registrarMedicao(double freqRespiratoria, double temperatura, int freqCardiaca) async {
-    if (!_formKey.currentState!.validate() || pacienteSelecionadoId == null) {
+    if (pacienteSelecionadoId == null) {
       setState(() => mensagem = "Preencha todos os campos corretamente.");
       return;
     }
@@ -226,7 +229,7 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
                   ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: () => ({}),
+                  onPressed: conectarDispositivo,
                   icon: const Icon(Icons.bluetooth),
                   label: Text(textString),
                   style: estiloBotao(Colors.teal),

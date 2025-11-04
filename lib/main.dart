@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/conectar_dispositivo.dart';
 import 'package:oxycare_app/states/ble_state.dart';
 import 'package:oxycare_app/utils.dart';
 import 'dart:convert';
@@ -57,7 +58,7 @@ class CuidarApp extends StatelessWidget {
         '/listar_pacientes': (context) => const ListarPacientesPage(),
         '/listar_usuarios': (context) => const ListarUsuariosPage(),
         '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
-        '/conectar_aparelho': (context) => const RegistrarMedicaoPage(),
+        '/conectar_aparelho': (context) => const ConectarDispositivoPage(),
 
         // Sem argumentos aqui, porque agora usaremos onGenerateRoute para pegar os parâmetros
         '/gerar_relatorio': (context) => const GerarRelatorioPage(),

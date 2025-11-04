@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oxycare_app/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -34,7 +35,7 @@ class _ListarUsuariosPageState extends State<ListarUsuariosPage> {
         return;
       }
 
-      final url = Uri.parse('http://107.21.234.209:8080/api/Usuarios');
+      final url = Uri.parse('$urlGlobal/api/Usuarios');
       final resposta = await http.get(
         url,
         headers: {'Authorization': 'Bearer $token'},

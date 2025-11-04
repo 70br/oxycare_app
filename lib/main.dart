@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/conectar_dispositivo.dart';
+import 'package:oxycare_app/states/ble_state.dart';
+import 'package:oxycare_app/utils.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 // Suas telas já existentes:
 import 'login_page.dart';
@@ -17,7 +21,12 @@ import 'gerar_relatorio_page.dart';
 // Nova tela de histórico
 import 'historico_page.dart';
 
-void main() => runApp(const CuidarApp());
+void main() => runApp(
+    ChangeNotifierProvider(
+      create: (_) => BleState(),
+      child: CuidarApp(),
+    ),
+);
 
 class CuidarApp extends StatelessWidget {
   const CuidarApp({super.key});
@@ -49,6 +58,7 @@ class CuidarApp extends StatelessWidget {
         '/listar_pacientes': (context) => const ListarPacientesPage(),
         '/listar_usuarios': (context) => const ListarUsuariosPage(),
         '/registrar_medicao': (context) => const RegistrarMedicaoPage(),
+        '/conectar_aparelho': (context) => const ConectarDispositivoPage(),
 
         // Sem argumentos aqui, porque agora usaremos onGenerateRoute para pegar os parâmetros
         '/gerar_relatorio': (context) => const GerarRelatorioPage(),
@@ -82,7 +92,7 @@ class TelaInicial extends StatelessWidget {
       return;
     }
 
-    final url = Uri.parse('http://107.21.234.209:8080/api/Auth/logout');
+    final url = Uri.parse('$urlGlobal/api/Auth/logout');
 
     try {
       await http.post(
@@ -121,7 +131,7 @@ class TelaInicial extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/registrar_medicao'),
-            child: const Text('Registrar Medição'),
+            child: const Text('Acompanhar Medição'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/gerar_relatorio'),

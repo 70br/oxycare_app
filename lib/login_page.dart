@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/utils.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     // ✅ Mantido o endpoint que você disse que está funcionando
-    final url = Uri.parse('http://107.21.234.209:8080/api/Auth/login');
+    final url = Uri.parse('$urlGlobal/api/Auth/login');
 
     try {
       final resposta = await http.post(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:oxycare_app/utils.dart';
+
 class CadastroUsuarioPage extends StatefulWidget {
   const CadastroUsuarioPage({super.key});
 
@@ -31,7 +33,7 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
       mensagemSucesso = null;
     });
 
-    final url = Uri.parse('http://107.21.234.209:8080/api/Usuarios');
+    final url = Uri.parse('$urlGlobal/api/Usuarios');
 
     final body = jsonEncode({
       'nome': nomeController.text.trim(),

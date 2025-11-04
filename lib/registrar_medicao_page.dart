@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/states/ble_state.dart';
+import 'package:oxycare_app/utils.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class RegistrarMedicaoPage extends StatefulWidget {
   const RegistrarMedicaoPage({super.key});
@@ -13,9 +16,7 @@ class RegistrarMedicaoPage extends StatefulWidget {
 
 class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
   final _formKey = GlobalKey<FormState>();
-  final temperaturaController = TextEditingController();
-  final frequenciaCardiacaController = TextEditingController();
-  final saturacaoController = TextEditingController();
+
 
   String? pacienteSelecionadoId;
   List<Map<String, String>> pacientes = [];
@@ -34,7 +35,7 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      final url = Uri.parse('http://107.21.234.209:8080/api/Pacientes');
+      final url = Uri.parse('$urlGlobal/api/Pacientes');
 
       final resposta = await http.get(
         url,
@@ -65,88 +66,8 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
     }
   }
 
-  void simularLeituraSensor() {
-    final random = Random();
-    setState(() {
-      temperaturaController.text =
-          (36.0 + random.nextDouble() * 1.5).toStringAsFixed(1);
-      frequenciaCardiacaController.text = (60 + random.nextInt(40)).toString();
-      saturacaoController.text =
-          (95 + random.nextInt(4) + random.nextDouble()).toStringAsFixed(1);
-      mensagem = "Simulação concluída com sucesso!";
-    });
-  }
-
-  Future<void> lerDoSensorBluetooth() async {
-    setState(() => mensagem = "Aguardando conexão Bluetooth...");
-  }
-
-  Future<void> lerDoSensorWiFi() async {
-    setState(() => mensagem = "Lendo via Wi-Fi...");
-  }
-
-  Future<void> registrarMedicao() async {
-    if (!_formKey.currentState!.validate() || pacienteSelecionadoId == null) {
-      setState(() => mensagem = "Preencha todos os campos corretamente.");
-      return;
-    }
-
-    setState(() {
-      carregando = true;
-      mensagem = null;
-    });
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('accessToken');
-
-      final url = Uri.parse('http://107.21.234.209:8080/api/Medicoes');
-
-      final body = jsonEncode({
-        'pacienteId': pacienteSelecionadoId,
-        'dataHora': DateTime.now().toIso8601String(),
-        'temperatura': double.tryParse(temperaturaController.text.trim()) ?? 0.0,
-        'frequenciaCardiaca':
-            int.tryParse(frequenciaCardiacaController.text.trim()) ?? 0,
-        'saturacao': double.tryParse(saturacaoController.text.trim()) ?? 0.0,
-      });
-
-      final resposta = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      );
-
-      if (resposta.statusCode == 201) {
-        setState(() {
-          mensagem = "✓ Medição registrada com sucesso!";
-        });
-        temperaturaController.clear();
-        frequenciaCardiacaController.clear();
-        saturacaoController.clear();
-      } else {
-        final erro = jsonDecode(resposta.body);
-        setState(() {
-          mensagem = erro['message'] ?? "Erro ao registrar medição.";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        mensagem = "Erro de conexão com o servidor.";
-      });
-    }
-
-    setState(() => carregando = false);
-  }
-
   @override
   void dispose() {
-    temperaturaController.dispose();
-    frequenciaCardiacaController.dispose();
-    saturacaoController.dispose();
     super.dispose();
   }
 
@@ -164,6 +85,66 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bleState = Provider.of<BleState>(context);
+    String textString = bleState.connected ? "Já Conectado!" : "Conectar a um Aparelho";
+  void conectarDispositivo() {
+    Navigator.pushReplacementNamed(context, '/conectar_aparelho');
+  }
+
+  Future<void> registrarMedicao(double freqRespiratoria, double temperatura, int freqCardiaca) async {
+    if (pacienteSelecionadoId == null) {
+      setState(() => mensagem = "Preencha todos os campos corretamente.");
+      return;
+    }
+
+    setState(() {
+      carregando = true;
+      mensagem = null;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      final url = Uri.parse('$urlGlobal/api/Medicoes');
+
+      final body = jsonEncode({
+        'pacienteId': pacienteSelecionadoId,
+        'dataHora': DateTime.now().toIso8601String(),
+        'temperatura': temperatura,
+        'frequenciaCardiaca':freqCardiaca,
+        'saturacao': freqRespiratoria,
+      });
+
+      final resposta = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (resposta.statusCode == 201) {
+        setState(() {
+          mensagem = "✓ Medição registrada com sucesso!";
+        });
+      } else {
+        final erro = jsonDecode(resposta.body);
+        setState(() {
+          mensagem = erro['message'] ?? "Erro ao registrar medição.";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        mensagem = "Erro de conexão com o servidor.";
+      });
+    }
+
+    setState(() => carregando = false);
+  }
+
+    bleState.setCallBack(registrarMedicao);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -188,6 +169,20 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.circle,
+                        size: 12, color: bleState.connected ? Colors.green : Colors.red),
+                    SizedBox(width: 6),
+                    Text(
+                      bleState.connected
+                          ? 'Conectado ao PROTOTIPO'
+                          : 'Não conectado... Aguarde conexão',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -219,46 +214,9 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
                             v == null ? "Selecione um paciente" : null,
                       ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: temperaturaController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: "Temperatura (°C)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? "Informe a temperatura" : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: frequenciaCardiacaController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: "Frequência Cardíaca (bpm)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? "Informe os batimentos" : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: saturacaoController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: "Saturação de O₂ (%)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? "Informe a saturação" : null,
-                ),
+                _buildCard("Freq. Cardíaca", bleState.freqCardiaca.toString(), "bpm", Icons.favorite, Colors.pink),
+                _buildCard("Temperatura", bleState.temperatura.toStringAsFixed(1), "ºC", Icons.thermostat, Colors.orange),
+                _buildCard("Freq. Respiratória", bleState.freqRespiratoria.toString(), "%", Icons.air, Colors.purple),
                 const SizedBox(height: 24),
                 if (mensagem != null)
                   Text(
@@ -271,34 +229,10 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
                   ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: carregando ? null : registrarMedicao,
-                  icon: const Icon(Icons.send),
-                  label: carregando
-                      ? const CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2)
-                      : const Text("Registrar Manualmente"),
-                  style: estiloBotao(Colors.blueAccent),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: simularLeituraSensor,
-                  icon: const Icon(Icons.sensors),
-                  label: const Text("Simular Leitura de Sensor"),
-                  style: estiloBotao(Colors.orangeAccent),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: lerDoSensorBluetooth,
+                  onPressed: conectarDispositivo,
                   icon: const Icon(Icons.bluetooth),
-                  label: const Text("Ler via Bluetooth (futuro)"),
+                  label: Text(textString),
                   style: estiloBotao(Colors.teal),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: lerDoSensorWiFi,
-                  icon: const Icon(Icons.wifi),
-                  label: const Text("Ler via Wi-Fi (futuro)"),
-                  style: estiloBotao(Colors.indigo),
                 ),
                 const SizedBox(height: 30),
                 const Divider(thickness: 1),
@@ -311,6 +245,47 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard(
+    String titulo,
+    String valor,
+    String unidade,
+    IconData icon,
+    Color color
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Color(0xFFF5F6FA),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 30, color: color),
+            SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(titulo, style: TextStyle(fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    Text(valor,
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 4),
+                    Text(unidade, style: TextStyle(fontSize: 16))
+                  ],
+                )
+              ],
+            )
+          ],
         ),
       ),
     );

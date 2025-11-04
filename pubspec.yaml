@@ -25,6 +25,7 @@ dependencies:
   flutter_blue_plus: ^1.31.13
   intl: ^0.20.2
   shared_preferences: ^2.3.3
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

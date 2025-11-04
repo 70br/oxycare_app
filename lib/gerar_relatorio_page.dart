@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -35,7 +36,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
       final token = prefs.getString('accessToken');
       if (token == null) return;
 
-      final url = Uri.parse('http://107.21.234.209:8080/api/Pacientes');
+      final url = Uri.parse('$urlGlobal/api/Pacientes');
       final resposta = await http.get(url, headers: {'Authorization': 'Bearer $token'});
 
       if (resposta.statusCode == 200) {
@@ -89,7 +90,7 @@ class _GerarRelatorioPageState extends State<GerarRelatorioPage> {
     final dataFimStr = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataFim!);
 
     final url = Uri.parse(
-      'http://107.21.234.209:8080/api/Relatorios/paciente/$pacienteId/gerar-pdf?dataInicio=$dataInicioStr&dataFim=$dataFimStr',
+      '$urlGlobal/api/Relatorios/paciente/$pacienteId/gerar-pdf?dataInicio=$dataInicioStr&dataFim=$dataFimStr',
     );
 
     try {

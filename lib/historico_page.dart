@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oxycare_app/utils.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +30,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      final url = Uri.parse('http://107.21.234.209:8080/api/Pacientes');
+      final url = Uri.parse('$urlGlobal/api/Pacientes');
 
       final resposta = await http.get(
         url,
@@ -75,7 +76,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
       final url = Uri.parse(
-          'http://107.21.234.209:8080/api/Historicos/paciente/$pacienteSelecionadoId');
+          '$urlGlobal/api/Historicos/paciente/$pacienteSelecionadoId');
 
       final resposta = await http.get(
         url,
@@ -127,7 +128,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      final url = Uri.parse('http://107.21.234.209:8080/api/Medicoes/$idMedicao');
+      final url = Uri.parse('$urlGlobal/api/Medicoes/$idMedicao');
 
       final resposta = await http.delete(
         url,

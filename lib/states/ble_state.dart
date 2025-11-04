@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:oxycare_app/utils.dart';
@@ -18,11 +19,17 @@ class BleState extends ChangeNotifier {
   int freqCardiaca = 0;
   double temperatura = 0;
   DateTime? lastUpdateTimestamp = null;
+  Future<void> Function(double freqRespiratoria, double temperatura, int freqCardiaca)? callback = null;
 
   final Guid uuidServico = Guid(HardwareCharacteristics.service);
   final Guid uuidFreqCardiaca = Guid(HardwareCharacteristics.heartRate);
   final Guid uuidFreqRespiratoria = Guid(HardwareCharacteristics.respiratoryRate);
   final Guid uuidTemperatura = Guid(HardwareCharacteristics.temperature);
+
+  void setCallBack(Future<void> Function(double freqRespiratoria, double temperatura, int freqCardiaca)? callback) {
+    callback = callback;
+  }
+
 
   Future setDisconnected() async {
     if(device != null) {
@@ -34,6 +41,7 @@ class BleState extends ChangeNotifier {
       await device?.disconnect();
       connected = false;
       device = null;
+      callback = null;
       notifyListeners();
     }
   }
@@ -79,6 +87,7 @@ class BleState extends ChangeNotifier {
               _subscriptionRespiratoria = c.onValueReceived.listen((value) {
                 temperatura = double.parse(_decode(value));
                 lastUpdateTimestamp = DateTime.now();
+                if(callback != null) callback!(freqRespiratoria, temperatura, freqCardiaca);
                 notifyListeners();
               });
           }

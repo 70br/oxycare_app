@@ -88,7 +88,7 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
     final bleState = Provider.of<BleState>(context);
     String textString = bleState.connected ? "Já Conectado!" : "Conectar a um Aparelho";
 
-  Future<void> registrarMedicao() async {
+  Future<void> registrarMedicao(double freqRespiratoria, double temperatura, int freqCardiaca) async {
     if (!_formKey.currentState!.validate() || pacienteSelecionadoId == null) {
       setState(() => mensagem = "Preencha todos os campos corretamente.");
       return;
@@ -108,9 +108,9 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
       final body = jsonEncode({
         'pacienteId': pacienteSelecionadoId,
         'dataHora': DateTime.now().toIso8601String(),
-        'temperatura': bleState.temperatura,
-        'frequenciaCardiaca':bleState.freqCardiaca,
-        'saturacao': bleState.freqRespiratoria,
+        'temperatura': temperatura,
+        'frequenciaCardiaca':freqCardiaca,
+        'saturacao': freqRespiratoria,
       });
 
       final resposta = await http.post(
@@ -141,7 +141,7 @@ class _RegistrarMedicaoPageState extends State<RegistrarMedicaoPage> {
     setState(() => carregando = false);
   }
 
-
+    bleState.setCallBack(registrarMedicao);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

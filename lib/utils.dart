@@ -1,4 +1,4 @@
-final urlGlobal = "https://1e9899470783.ngrok-free.app";
+final urlGlobal = "http://107.21.234.209:8080";
 
 class HardwareCharacteristics {
   static const service = "91bad492-b950-4226-aa2b-4ede9fa42f59";

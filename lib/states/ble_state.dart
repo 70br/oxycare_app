@@ -49,6 +49,17 @@ class BleState extends ChangeNotifier {
   Future setConnected(BluetoothDevice connectedDevice) async {
     connected = true;
     device = connectedDevice;
+    connectedDevice.connectionState.listen((state) async {
+      if(state == BluetoothConnectionState.disconnected) {
+        await _subscriptionCardio?.cancel();
+        await _subscriptionTemperatura?.cancel();
+        await _subscriptionRespiratoria?.cancel();
+        connected = false;
+        device = null;
+        _callback = null;
+        notifyListeners();
+      }
+    });
     await _watchServicos(connectedDevice);
     notifyListeners();
   }

@@ -148,14 +148,6 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 30),
 
               ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/listar_usuarios'),
-                icon: const Icon(Icons.group),
-                label: const Text('Gerenciar Usuários'),
-                style: _estiloBotao(Colors.blue),
-              ),
-              const SizedBox(height: 18),
-
-              ElevatedButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/listar_pacientes'),
                 icon: const Icon(Icons.local_hospital),
                 label: const Text('Gerenciar Pacientes'),

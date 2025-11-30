@@ -20,10 +20,10 @@ import 'gerar_relatorio_page.dart';
 
 // Nova tela de histórico
 import 'historico_page.dart';
-
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() => runApp(
     ChangeNotifierProvider(
-      create: (_) => BleState(),
+      create: (context) => BleState(navigatorKey),
       child: CuidarApp(),
     ),
 );
@@ -35,6 +35,7 @@ class CuidarApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cuidar+',
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,

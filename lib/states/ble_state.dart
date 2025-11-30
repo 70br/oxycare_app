@@ -4,13 +4,20 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:oxycare_app/main.dart';
 import 'package:oxycare_app/utils.dart';
 
 class BleState extends ChangeNotifier {
+
+  GlobalKey<NavigatorState> _navigatorKey;
+  BleState(this._navigatorKey);
+
   bool connected = false;
+  DateTime lastDisconnectionRequestDate = DateTime(1990);
   BluetoothDevice? device;
   List<ScanResult> lastResults = [];
 
+  StreamSubscription<BluetoothConnectionState>? _subscriptionListener = null;
   StreamSubscription<List<int>>? _subscriptionCardio;
   StreamSubscription<List<int>>? _subscriptionTemperatura;
   StreamSubscription<List<int>>? _subscriptionRespiratoria;
@@ -38,6 +45,7 @@ class BleState extends ChangeNotifier {
       await _subscriptionRespiratoria?.cancel();
 
       await Future.delayed(const Duration(milliseconds: 400));
+      lastDisconnectionRequestDate = DateTime.now();
       await device?.disconnect();
       connected = false;
       device = null;
@@ -49,17 +57,29 @@ class BleState extends ChangeNotifier {
   Future setConnected(BluetoothDevice connectedDevice) async {
     connected = true;
     device = connectedDevice;
-    connectedDevice.connectionState.listen((state) async {
-      if(state == BluetoothConnectionState.disconnected) {
-        await _subscriptionCardio?.cancel();
-        await _subscriptionTemperatura?.cancel();
-        await _subscriptionRespiratoria?.cancel();
-        connected = false;
-        device = null;
-        _callback = null;
-        notifyListeners();
-      }
-    });
+    
+    _subscriptionListener ??= connectedDevice.connectionState.listen((state) async {
+        if(
+            state == BluetoothConnectionState.disconnected &&
+            // Verifica se a conexão foi perdida ou solicitada
+            DateTime.now().difference(lastDisconnectionRequestDate).inSeconds > 5
+          ) {
+          print("Executando...");
+          await _subscriptionCardio?.cancel();
+          await _subscriptionTemperatura?.cancel();
+          await _subscriptionRespiratoria?.cancel();
+          await _subscriptionListener?.cancel();
+          connected = false;
+          device = null;
+          _callback = null;
+          lastDisconnectionRequestDate = DateTime.now();
+          _subscriptionListener = null;
+          notifyListeners();
+          _showAlert();
+        }
+      });
+  
+
     await _watchServicos(connectedDevice);
     notifyListeners();
   }
@@ -107,4 +127,23 @@ class BleState extends ChangeNotifier {
     }
   }
 
+void _showAlert() {
+  showDialog(
+    context: navigatorKey.currentContext!, // Assuming you have a navigatorKey
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Conexão perdida"),
+        content: Text("Algo aconteceu e a conexão com o aparelho Cuidar+ foi perdida"),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Entendi'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 }

@@ -1,4 +1,4 @@
-final urlGlobal = "http://107.21.234.209:8080";
+final urlGlobal = "http://oxycare-lb-1632672775.us-east-1.elb.amazonaws.com";
 
 class HardwareCharacteristics {
   static const service = "91bad492-b950-4226-aa2b-4ede9fa42f59";

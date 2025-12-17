@@ -53,13 +53,43 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
           mensagemSucesso = 'Usuário cadastrado com sucesso!';
         });
 
-        // Espera um momento e volta para a tela de login
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.pop(context);
       } else {
         final erro = jsonDecode(resposta.body);
+        String msg = 'Falha ao cadastrar usuário';
+
+        final emailDigitado = emailController.text.trim();
+
+        // =============================
+        // TRATAMENTO DE EMAIL INVÁLIDO E REPETIDO
+        // =============================
+        if (erro is Map) {
+          if (erro.containsKey('errors')) {
+            final erros = erro['errors'] as Map;
+            msg = erros.values.map((e) => (e as List).join(', ')).join('\n');
+          } else if (erro.containsKey('title')) {
+            final title = erro['title'].toString().toLowerCase();
+
+            if (title.contains('validation')) {
+              if (!emailValido(emailDigitado)) {
+                msg = 'Email inválido';
+              } else {
+                msg = 'Email já cadastrado';
+              }
+            } else {
+              msg = erro['title'];
+            }
+          } else if (erro.containsKey('detail')) {
+            msg = erro['detail'];
+          } else if (erro.containsKey('message')) {
+            msg = erro['message'];
+          }
+        }
+        // =============================
+
         setState(() {
-          mensagemErro = erro['message'] ?? 'Falha ao cadastrar usuário';
+          mensagemErro = msg;
         });
       }
     } catch (e) {
@@ -71,6 +101,23 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
     setState(() {
       carregando = false;
     });
+  }
+
+  bool emailValido(String email) {
+    final regex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return regex.hasMatch(email);
+  }
+
+  bool senhaForte(String senha) {
+    final maiuscula = RegExp(r'[A-Z]');
+    final minuscula = RegExp(r'[a-z]');
+    final numero = RegExp(r'[0-9]');
+    final simbolo = RegExp(r'[!@#\$&*~%^()\-_=+{}\[\]:;,.<>?/|]');
+    return senha.length >= 8 &&
+        maiuscula.hasMatch(senha) &&
+        minuscula.hasMatch(senha) &&
+        numero.hasMatch(senha) &&
+        simbolo.hasMatch(senha);
   }
 
   @override
@@ -99,7 +146,6 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
               ),
               const SizedBox(height: 24),
 
-              // Nome
               TextFormField(
                 controller: nomeController,
                 decoration: InputDecoration(
@@ -113,7 +159,6 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
               ),
               const SizedBox(height: 12),
 
-              // Email
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -124,18 +169,18 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Informe o email';
-                  if (!v.contains('@')) return 'Email inválido';
+                  if (!emailValido(v)) return 'Email inválido';
                   return null;
                 },
               ),
               const SizedBox(height: 12),
 
-              // Senha
               TextFormField(
                 controller: senhaController,
                 obscureText: !_mostrarSenha,
                 decoration: InputDecoration(
                   labelText: 'Senha',
+                  errorMaxLines: 4,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -152,12 +197,16 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
                     },
                   ),
                 ),
-                validator: (v) =>
-                    v != null && v.length >= 6 ? null : 'Mínimo 6 caracteres',
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Informe a senha';
+                  if (!senhaForte(v)) {
+                    return 'Senha fraca: mínimo 8 caracteres, com maiúscula, minúscula, número e símbolo.';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
 
-              // Confirmar senha
               TextFormField(
                 controller: confirmarSenhaController,
                 obscureText: !_mostrarConfirmarSenha,
@@ -174,7 +223,8 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
                     ),
                     onPressed: () {
                       setState(() {
-                        _mostrarConfirmarSenha = !_mostrarConfirmarSenha;
+                        _mostrarConfirmarSenha =
+                            !_mostrarConfirmarSenha;
                       });
                     },
                   ),
@@ -184,7 +234,6 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
               ),
               const SizedBox(height: 20),
 
-              // Mensagens de erro/sucesso
               if (mensagemErro != null)
                 Text(
                   mensagemErro!,
@@ -197,7 +246,6 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
                 ),
               const SizedBox(height: 20),
 
-              // Botão cadastrar
               SizedBox(
                 width: double.infinity,
                 height: 48,

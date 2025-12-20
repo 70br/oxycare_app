@@ -21,6 +21,10 @@ class _HistoricoPageState extends State<HistoricoPage> {
   bool carregando = false;
   String? mensagem;
 
+  // ✅ ADICIONADO (sem impactar nada)
+  DateTime? dataInicio;
+  DateTime? dataFim;
+
   @override
   void initState() {
     super.initState();
@@ -61,9 +65,36 @@ class _HistoricoPageState extends State<HistoricoPage> {
     }
   }
 
+  // ✅ DatePicker simples e nativo
+  Future<void> escolherData(bool inicio) async {
+    final selecionada = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (selecionada != null) {
+      setState(() {
+        if (inicio) {
+          dataInicio = selecionada;
+        } else {
+          dataFim = selecionada;
+        }
+      });
+    }
+  }
+
   Future<void> carregarHistorico() async {
     if (pacienteSelecionadoId == null) {
       setState(() => mensagem = "Selecione um paciente primeiro.");
+      return;
+    }
+
+    if (dataInicio != null &&
+        dataFim != null &&
+        dataInicio!.isAfter(dataFim!)) {
+      setState(() => mensagem = "A data inicial deve ser antes da data final.");
       return;
     }
 
@@ -76,8 +107,23 @@ class _HistoricoPageState extends State<HistoricoPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      final url = Uri.parse(
-          '$urlGlobal/api/Historicos/paciente/$pacienteSelecionadoId');
+
+      Uri url;
+
+      // ✅ AQUI ESTÁ O FILTRO POR PERÍODO
+      if (dataInicio != null && dataFim != null) {
+        final inicioIso = dataInicio!.toUtc().toIso8601String();
+        final fimIso = dataFim!.toUtc().toIso8601String();
+
+        url = Uri.parse(
+          '$urlGlobal/api/Historicos/paciente/$pacienteSelecionadoId/periodo'
+          '?dataInicio=$inicioIso&dataFim=$fimIso',
+        );
+      } else {
+        url = Uri.parse(
+          '$urlGlobal/api/Historicos/paciente/$pacienteSelecionadoId',
+        );
+      }
 
       final resposta = await http.get(
         url,
@@ -234,6 +280,34 @@ class _HistoricoPageState extends State<HistoricoPage> {
                       onChanged: (value) =>
                           setState(() => pacienteSelecionadoId = value),
                     ),
+
+              const SizedBox(height: 12),
+
+              // ✅ CAMPOS DE DATA (compactos e bonitos)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(dataInicio == null
+                          ? "Data inicial"
+                          : DateFormat('dd/MM/yyyy').format(dataInicio!)),
+                      onPressed: () => escolherData(true),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(dataFim == null
+                          ? "Data final"
+                          : DateFormat('dd/MM/yyyy').format(dataFim!)),
+                      onPressed: () => escolherData(false),
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 16),
 
               ElevatedButton.icon(
@@ -245,6 +319,7 @@ class _HistoricoPageState extends State<HistoricoPage> {
                     : const Text("Buscar Histórico"),
                 style: estiloBotao(Colors.blueAccent),
               ),
+
               const SizedBox(height: 20),
 
               if (mensagem != null)
@@ -252,7 +327,9 @@ class _HistoricoPageState extends State<HistoricoPage> {
                   mensagem!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: mensagem!.startsWith("✅") ? Colors.green : Colors.red,
+                    color: mensagem!.startsWith("✅")
+                        ? Colors.green
+                        : Colors.red,
                     fontSize: 16,
                   ),
                 ),
@@ -264,7 +341,6 @@ class _HistoricoPageState extends State<HistoricoPage> {
                     primaryXAxis: DateTimeAxis(),
                     legend: Legend(isVisible: true),
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    // 🔧 AJUSTE FEITO AQUI
                     series: <CartesianSeries<_MedicaoData, DateTime>>[
                       LineSeries<_MedicaoData, DateTime>(
                         dataSource: dadosGrafico,
@@ -315,13 +391,15 @@ class _HistoricoPageState extends State<HistoricoPage> {
                           ),
                           const SizedBox(height: 6),
                           Text("🌡️ Temperatura: ${m['temperatura']} °C"),
-                          Text("❤️ Frequência: ${m['frequenciaCardiaca']} bpm"),
+                          Text(
+                              "❤️ Frequência: ${m['frequenciaCardiaca']} bpm"),
                           Text("🫁 Saturação: ${m['saturacao']}%"),
                           const SizedBox(height: 10),
                           Align(
                             alignment: Alignment.centerRight,
                             child: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon:
+                                  const Icon(Icons.delete, color: Colors.red),
                               tooltip: "Excluir Medição",
                               onPressed: () => deletarMedicao(m['id']),
                             ),
